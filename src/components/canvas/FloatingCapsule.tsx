@@ -49,6 +49,7 @@ export function FloatingCapsule({
     selectCapsule,
     formationMode,
     registerCollision,
+    setIsDraggingCapsule,
   } = useGravity();
 
   const isSelected = selectedCapsuleId === id;
@@ -187,6 +188,7 @@ export function FloatingCapsule({
   const handlePointerDown = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     setIsDragging(true);
+    setIsDraggingCapsule(true);
     selectCapsule(id);
     onSelect?.(id);
     if (rigidBodyRef.current) {
@@ -216,6 +218,7 @@ export function FloatingCapsule({
       );
     }
     setIsDragging(false);
+    setIsDraggingCapsule(false);
   };
 
   // Throttled Collision Impact Handler
@@ -245,7 +248,10 @@ export function FloatingCapsule({
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => {
           setHovered(false);
-          if (isDragging) setIsDragging(false);
+          if (isDragging) {
+            setIsDragging(false);
+            setIsDraggingCapsule(false);
+          }
         }}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}

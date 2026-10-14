@@ -1,9 +1,12 @@
 "use client";
 
+import { useFrame } from "@react-three/fiber";
 import { Physics, CuboidCollider } from "@react-three/rapier";
+import * as THREE from "three";
 import { SpaceBackground } from "./SpaceBackground";
 import { FloatingCapsule } from "./FloatingCapsule";
 import { CursorForceField } from "./CursorForceField";
+import { CentralCoreOrb } from "./CentralCoreOrb";
 import { INITIAL_IDEA_CAPSULES } from "@/lib/db";
 import { PHYSICS_BOUNDS } from "@/lib/physics";
 import { useGravity } from "@/context/GravityContext";
@@ -13,12 +16,34 @@ interface PhysicsWorldProps {
   gravity?: [number, number, number];
 }
 
+/**
+ * Lightweight camera rig providing gentle tilt & parallax based on pointer coordinates.
+ * Automatically disabled when a capsule is being grabbed to maintain throw precision.
+ */
+function CameraParallaxRig() {
+  const { isDraggingCapsule } = useGravity();
+
+  useFrame(({ camera, pointer }, delta) => {
+    if (isDraggingCapsule) return;
+
+    // Base camera position: [0, 1.5, 9]
+    const targetX = pointer.x * 0.8;
+    const targetY = 1.5 + pointer.y * 0.5;
+
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX, delta * 2.2);
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY, delta * 2.2);
+  });
+
+  return null;
+}
+
 export function PhysicsWorld({
   onSelectCapsule,
   gravity,
 }: PhysicsWorldProps) {
   const { physicsConfig } = useGravity();
   const effectiveGravity = gravity ?? physicsConfig.gravity;
+
   return (
     <>
       {/* Lighting Configuration for deep space aesthetic */}
@@ -29,6 +54,9 @@ export function PhysicsWorld({
 
       {/* Cosmic space starfield and dust particles */}
       <SpaceBackground />
+
+      {/* Smooth Pointer Camera Parallax Rig */}
+      <CameraParallaxRig />
 
       {/* Rapier WASM Physics Engine Provider */}
       <Physics gravity={effectiveGravity} timeStep={1 / 60}>
@@ -69,6 +97,9 @@ export function PhysicsWorld({
           args={[20, 20, 1]}
           restitution={0.9}
         />
+
+        {/* 3D DEadEnD Central Gravitational Core Orb Collider */}
+        <CentralCoreOrb />
 
         {/* 3D Kinematic Cursor Force-Field */}
         <CursorForceField />
