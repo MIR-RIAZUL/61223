@@ -16,6 +16,8 @@ interface FloatingCapsuleProps {
   position: [number, number, number];
   mass?: number;
   onSelect?: (id: string) => void;
+  index?: number;
+  total?: number;
 }
 
 export function FloatingCapsule({
@@ -26,12 +28,28 @@ export function FloatingCapsule({
   position,
   mass = 1.0,
   onSelect,
+  index = 0,
+  total = 6,
 }: FloatingCapsuleProps) {
   const rigidBodyRef = useRef<RapierRigidBody>(null);
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
-  const { isZeroGravity, shockwaveCount, selectedCapsuleId, selectCapsule } = useGravity();
-  const lastShockwaveRef = useRef(shockwaveCount);
+  const [isDragging, setIsDragging] = useState(false);
+  const [collisionFlash, setCollisionFlash] = useState(false);
+
+  const lastShockwaveRef = useRef(0);
+  const lastCollisionTimeRef = useRef(0);
+  const lastPointerVelocity = useRef(new THREE.Vector3(0, 0, 0));
+  const previousPointerPos = useRef(new THREE.Vector3(0, 0, 0));
+
+  const {
+    isZeroGravity,
+    shockwaveCount,
+    selectedCapsuleId,
+    selectCapsule,
+    formationMode,
+    registerCollision,
+  } = useGravity();
 
   const isSelected = selectedCapsuleId === id;
 
@@ -69,49 +87,146 @@ export function FloatingCapsule({
     }
   }, [shockwaveCount]);
 
-  useFrame(() => {
+  // Main 3D frame update: Grab-and-throw spring physics & Orbital Formation Modes
+  useFrame(({ pointer, viewport, clock }, delta) => {
     if (!rigidBodyRef.current) return;
 
-    // Apply zero-g restorative force if capsule floats too far away in zero-g mode
+    // 1. Interactive 3D Pointer Grab-and-Throw Mechanics
+    if (isDragging) {
+      const targetX = (pointer.x * viewport.width) / 2;
+      const targetY = (pointer.y * viewport.height) / 2;
+      const targetZ = 0;
+
+      const translation = rigidBodyRef.current.translation();
+      const dx = targetX - translation.x;
+      const dy = targetY - translation.y;
+      const dz = targetZ - translation.z;
+
+      // Track velocity for sling-throw on release
+      const safeDelta = delta > 0.001 ? delta : 0.016;
+      lastPointerVelocity.current.set(
+        (targetX - previousPointerPos.current.x) / safeDelta,
+        (targetY - previousPointerPos.current.y) / safeDelta,
+        0
+      );
+      previousPointerPos.current.set(targetX, targetY, targetZ);
+
+      // Strong spring velocity pulling rigid body toward cursor
+      const springK = 14.0;
+      rigidBodyRef.current.setLinvel(
+        {
+          x: dx * springK,
+          y: dy * springK,
+          z: dz * springK,
+        },
+        true
+      );
+      return;
+    }
+
+    // 2. Orbital Formation Physics in Zero-G
     if (isZeroGravity) {
       const translation = rigidBodyRef.current.translation();
-      const [fx, fy, fz] = calculateRestoringForce([
-        translation.x,
-        translation.y,
-        translation.z,
-      ]);
 
-      if (fx !== 0 || fy !== 0 || fz !== 0) {
+      if (formationMode === "orbital-ring") {
+        // Compute animated orbital slot along satellite ring
+        const elapsedTime = clock.getElapsedTime();
+        const angle = (index / total) * Math.PI * 2 + elapsedTime * 0.4;
+        const radius = 4.2;
+        const targetX = Math.cos(angle) * radius;
+        const targetY = Math.sin(angle * 1.5) * 0.6;
+        const targetZ = Math.sin(angle) * (radius * 0.65);
+
+        const steerK = 5.2;
         rigidBodyRef.current.applyImpulse(
-          { x: fx * 0.05, y: fy * 0.05, z: fz * 0.05 },
+          {
+            x: (targetX - translation.x) * delta * steerK,
+            y: (targetY - translation.y) * delta * steerK,
+            z: (targetZ - translation.z) * delta * steerK,
+          },
           true
         );
+      } else if (formationMode === "vortex-well") {
+        // Spiral inward attraction toward [0,0,0] with tangential spin
+        const dist = Math.sqrt(translation.x ** 2 + translation.z ** 2) || 0.1;
+        const radialPull = 3.4;
+        const fx = (-translation.x / dist) * radialPull;
+        const fz = (-translation.z / dist) * radialPull;
+        const spinSpeed = 4.2;
+        const tx = (-translation.z / dist) * spinSpeed;
+        const tz = (translation.x / dist) * spinSpeed;
+        const fy = -translation.y * 2.8;
+
+        rigidBodyRef.current.applyImpulse(
+          {
+            x: (fx + tx) * delta * 2.4,
+            y: fy * delta * 2.4,
+            z: (fz + tz) * delta * 2.4,
+          },
+          true
+        );
+      } else {
+        // 'free-drift': gentle weightless restoring force to boundary box
+        const [fx, fy, fz] = calculateRestoringForce([
+          translation.x,
+          translation.y,
+          translation.z,
+        ]);
+
+        if (fx !== 0 || fy !== 0 || fz !== 0) {
+          rigidBodyRef.current.applyImpulse(
+            { x: fx * 0.05, y: fy * 0.05, z: fz * 0.05 },
+            true
+          );
+        }
       }
     }
   });
 
-  const handlePointerDown = () => {
+  // Handle pointer down (grab initiation & selection)
+  const handlePointerDown = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    setIsDragging(true);
+    selectCapsule(id);
+    onSelect?.(id);
     if (rigidBodyRef.current) {
-      // Apply energetic impulse on click
-      const impulseX = (Math.random() - 0.5) * 3;
-      const impulseY = Math.random() * 2 + 1;
-      const impulseZ = (Math.random() - 0.5) * 3;
+      rigidBodyRef.current.wakeUp();
+    }
+  };
+
+  // Handle pointer up (sling-throw release)
+  const handlePointerUp = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (isDragging && rigidBodyRef.current) {
       rigidBodyRef.current.applyImpulse(
-        { x: impulseX, y: impulseY, z: impulseZ },
+        {
+          x: Math.max(-12, Math.min(12, lastPointerVelocity.current.x * 0.35)),
+          y: Math.max(-12, Math.min(12, lastPointerVelocity.current.y * 0.35)),
+          z: Math.max(-12, Math.min(12, lastPointerVelocity.current.z * 0.35)),
+        },
         true
       );
       rigidBodyRef.current.applyTorqueImpulse(
         {
-          x: (Math.random() - 0.5) * 0.5,
-          y: (Math.random() - 0.5) * 0.5,
-          z: (Math.random() - 0.5) * 0.5,
+          x: (Math.random() - 0.5) * 2,
+          y: (Math.random() - 0.5) * 2,
+          z: (Math.random() - 0.5) * 2,
         },
         true
       );
     }
-    // Select this capsule in global GravityContext and notify parent
-    selectCapsule(id);
-    onSelect?.(id);
+    setIsDragging(false);
+  };
+
+  // Throttled Collision Impact Handler
+  const handleCollisionEnter = () => {
+    const now = performance.now();
+    if (now - lastCollisionTimeRef.current > 350) {
+      lastCollisionTimeRef.current = now;
+      registerCollision();
+      setCollisionFlash(true);
+      setTimeout(() => setCollisionFlash(false), 240);
+    }
   };
 
   return (
@@ -124,21 +239,54 @@ export function FloatingCapsule({
       restitution={0.85}
       friction={0.2}
       mass={mass}
+      onCollisionEnter={handleCollisionEnter}
     >
       <group
         onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
+        onPointerOut={() => {
+          setHovered(false);
+          if (isDragging) setIsDragging(false);
+        }}
         onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
       >
-        {/* Physical 3D Capsule Geometry */}
+        {/* Physical 3D Capsule Geometry with Dynamic Emissive Glow */}
         <mesh ref={meshRef} castShadow receiveShadow>
           <capsuleGeometry args={[0.45, 0.9, 16, 32]} />
           <meshStandardMaterial
-            color={isSelected ? "#00f0ff" : hovered ? "#ffffff" : color}
+            color={
+              collisionFlash
+                ? "#f59e0b"
+                : isDragging
+                ? "#f59e0b"
+                : isSelected
+                ? "#00f0ff"
+                : hovered
+                ? "#ffffff"
+                : color
+            }
             roughness={0.22}
             metalness={0.85}
-            emissive={isSelected ? "#00f0ff" : color}
-            emissiveIntensity={isSelected ? 1.5 : hovered ? 0.9 : 0.35}
+            emissive={
+              collisionFlash
+                ? "#f59e0b"
+                : isDragging
+                ? "#f59e0b"
+                : isSelected
+                ? "#00f0ff"
+                : color
+            }
+            emissiveIntensity={
+              collisionFlash
+                ? 2.5
+                : isDragging
+                ? 1.8
+                : isSelected
+                ? 1.5
+                : hovered
+                ? 0.9
+                : 0.35
+            }
           />
         </mesh>
 
@@ -146,15 +294,28 @@ export function FloatingCapsule({
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[0.7, 0.76, 32]} />
           <meshBasicMaterial
-            color={isSelected ? "#00f0ff" : color}
+            color={isDragging ? "#f59e0b" : isSelected ? "#00f0ff" : color}
             side={THREE.DoubleSide}
             transparent
-            opacity={isSelected ? 1.0 : hovered ? 0.8 : 0.3}
+            opacity={isDragging ? 1.0 : isSelected ? 1.0 : hovered ? 0.8 : 0.3}
           />
         </mesh>
 
+        {/* High-Contrast Cyan/Amber Grab Halo while dragging */}
+        {isDragging && (
+          <mesh rotation={[0, 0, 0]}>
+            <sphereGeometry args={[0.72, 16, 16]} />
+            <meshBasicMaterial
+              color="#f59e0b"
+              wireframe
+              transparent
+              opacity={0.85}
+            />
+          </mesh>
+        )}
+
         {/* Selected Highlight Outer Resonance Halo */}
-        {isSelected && (
+        {isSelected && !isDragging && (
           <mesh rotation={[Math.PI / 4, Math.PI / 4, 0]}>
             <ringGeometry args={[0.85, 0.92, 32]} />
             <meshBasicMaterial
@@ -175,7 +336,9 @@ export function FloatingCapsule({
         >
           <div
             className={`flex flex-col items-center px-3 py-1.5 rounded-lg border backdrop-blur-md transition-all duration-300 ${
-              isSelected
+              isDragging
+                ? "hud-glass border-[#f59e0b] scale-125 shadow-[0_0_25px_rgba(245,158,11,0.8)] ring-1 ring-[#f59e0b]"
+                : isSelected
                 ? "hud-glass border-[#00f0ff] scale-125 shadow-[0_0_25px_rgba(0,240,255,0.7)] ring-1 ring-[#00f0ff]"
                 : hovered
                 ? "hud-glass border-[#00f0ff] scale-110 shadow-[0_0_15px_rgba(0,240,255,0.4)]"

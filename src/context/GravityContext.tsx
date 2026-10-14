@@ -4,6 +4,8 @@ import React, { createContext, useContext, useState, useCallback, useMemo } from
 import { PhysicsConfig } from "@/types";
 import { DEFAULT_PHYSICS_CONFIG } from "@/lib/physics";
 
+export type FormationMode = 'free-drift' | 'orbital-ring' | 'vortex-well';
+
 export interface GravityContextType {
   physicsConfig: PhysicsConfig;
   isZeroGravity: boolean;
@@ -15,6 +17,10 @@ export interface GravityContextType {
   toggleCursorForce: () => void;
   selectedCapsuleId: string | null;
   selectCapsule: (id: string | null) => void;
+  formationMode: FormationMode;
+  setFormationMode: (mode: FormationMode) => void;
+  collisionCount: number;
+  registerCollision: () => void;
 }
 
 const GravityContext = createContext<GravityContextType | null>(null);
@@ -24,6 +30,8 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
   const [shockwaveCount, setShockwaveCount] = useState<number>(0);
   const [cursorForceEnabled, setCursorForceEnabled] = useState<boolean>(true);
   const [selectedCapsuleId, setSelectedCapsuleId] = useState<string | null>(null);
+  const [formationMode, setFormationMode] = useState<FormationMode>('free-drift');
+  const [collisionCount, setCollisionCount] = useState<number>(0);
 
   const isZeroGravity = useMemo(
     () => physicsConfig.gravity[1] === 0,
@@ -63,6 +71,10 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
     setSelectedCapsuleId(id);
   }, []);
 
+  const registerCollision = useCallback(() => {
+    setCollisionCount((prev) => prev + 1);
+  }, []);
+
   const value = useMemo(
     () => ({
       physicsConfig,
@@ -75,6 +87,10 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
       toggleCursorForce,
       selectedCapsuleId,
       selectCapsule,
+      formationMode,
+      setFormationMode,
+      collisionCount,
+      registerCollision,
     }),
     [
       physicsConfig,
@@ -87,6 +103,9 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
       toggleCursorForce,
       selectedCapsuleId,
       selectCapsule,
+      formationMode,
+      collisionCount,
+      registerCollision,
     ]
   );
 

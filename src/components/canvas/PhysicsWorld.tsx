@@ -88,6 +88,8 @@ export function PhysicsWorld({
               color={capsule.colorTheme}
               position={[offsetX, offsetY, offsetZ]}
               mass={capsule.metrics.mass}
+              index={index}
+              total={INITIAL_IDEA_CAPSULES.length}
               onSelect={onSelectCapsule}
             />
           );

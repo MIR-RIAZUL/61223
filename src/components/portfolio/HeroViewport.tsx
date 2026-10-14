@@ -15,6 +15,7 @@ import {
   Sparkles, 
   Zap, 
   Radio, 
+  Activity,
   X 
 } from "lucide-react";
 
@@ -50,7 +51,10 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
     cursorForceEnabled,
     toggleCursorForce,
     selectedCapsuleId,
-    selectCapsule
+    selectCapsule,
+    formationMode,
+    setFormationMode,
+    collisionCount,
   } = useGravity();
 
   const activeCapsule = INITIAL_IDEA_CAPSULES.find(
@@ -68,23 +72,70 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
       </div>
 
       {/* Futuristic Floating HUD Overlays */}
-      <div className="absolute top-4 left-4 right-4 z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pointer-events-none">
+      <div className="absolute top-4 left-4 right-4 z-10 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-3 pointer-events-none">
+        {/* Left Section: Badges & Segmented Formation Switcher */}
         <div className="flex items-center gap-2 pointer-events-auto flex-wrap">
           <Badge variant="cyan" className="py-1 px-3">
             <Orbit className="w-3.5 h-3.5 text-[#00f0ff] animate-spin" />
             <span className="font-mono">RIAZUL // DEadEnD</span>
           </Badge>
-          <Badge variant="purple" className="py-1 px-3 hidden md:inline-flex">
+          <Badge variant="purple" className="py-1 px-3 hidden sm:inline-flex">
             <Cpu className="w-3.5 h-3.5 text-[#8b5cf6]" />
-            <span className="font-mono">FLUTTER & WEBGPU ARCHITECTURE</span>
+            <span className="font-mono">FLUTTER & WEBGPU</span>
           </Badge>
-          <Badge variant="emerald" className="py-1 px-2.5 hidden sm:inline-flex text-[11px] font-mono">
+          <Badge variant="emerald" className="py-1 px-2.5 hidden md:inline-flex text-[11px] font-mono">
             <Sparkles className="w-3 h-3 text-emerald-400 mr-1" />
             DHAKA (UTC+6)
           </Badge>
+
+          {/* Sleek Segmented HUD Formation Mode Switcher */}
+          <div className="flex items-center p-1 rounded-xl bg-slate-950/85 border border-slate-800/90 backdrop-blur-md font-mono text-[10px] sm:text-[11px] shadow-inner">
+            <button
+              onClick={() => setFormationMode("free-drift")}
+              className={`px-2.5 py-1 rounded-lg transition-all ${
+                formationMode === "free-drift"
+                  ? "bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff]/40 shadow-[0_0_10px_rgba(0,240,255,0.3)] font-semibold"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              FREE DRIFT
+            </button>
+            <button
+              onClick={() => setFormationMode("orbital-ring")}
+              className={`px-2.5 py-1 rounded-lg transition-all ${
+                formationMode === "orbital-ring"
+                  ? "bg-[#8b5cf6]/25 text-[#c084fc] border border-[#8b5cf6]/50 shadow-[0_0_10px_rgba(139,92,246,0.3)] font-semibold"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              ORBITAL RING
+            </button>
+            <button
+              onClick={() => setFormationMode("vortex-well")}
+              className={`px-2.5 py-1 rounded-lg transition-all ${
+                formationMode === "vortex-well"
+                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.3)] font-semibold"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              VORTEX WELL
+            </button>
+          </div>
         </div>
 
+        {/* Right Section: Telemetry & Controls */}
         <div className="flex items-center gap-2 pointer-events-auto flex-wrap">
+          {/* Live Collisions / Impacts Counter */}
+          <Badge
+            variant="outline"
+            className={`py-1 px-2.5 text-[11px] font-mono border-amber-500/40 text-amber-400 bg-amber-500/10 transition-all ${
+              collisionCount > 0 ? "animate-pulse shadow-[0_0_12px_rgba(245,158,11,0.35)]" : ""
+            }`}
+          >
+            <Activity className="w-3 h-3 text-amber-400 mr-1" />
+            IMPACTS: {collisionCount}
+          </Badge>
+
           {/* 3D Cursor Force Field Toggle */}
           <Button
             size="sm"
@@ -94,7 +145,8 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
             title="Toggle 3D Kinematic Cursor Force-Field"
           >
             <Radio className={`w-3.5 h-3.5 ${cursorForceEnabled ? "text-[#00f0ff] animate-pulse" : "text-slate-400"}`} />
-            <span>{cursorForceEnabled ? "FORCE FIELD: ON" : "FORCE FIELD: OFF"}</span>
+            <span className="hidden sm:inline">{cursorForceEnabled ? "FORCE FIELD: ON" : "FORCE FIELD: OFF"}</span>
+            <span className="sm:hidden">{cursorForceEnabled ? "FORCE: ON" : "FORCE: OFF"}</span>
           </Button>
 
           {/* Kinetic Shockwave Impulse Trigger */}
@@ -122,7 +174,7 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
 
           {/* Admin Panel Link */}
           <Link href="/admin">
-            <Button size="sm" variant="outline" className="text-xs font-mono gap-1">
+            <Button size="sm" variant="outline" className="text-xs font-mono gap-1 hidden md:inline-flex">
               <Terminal className="w-3.5 h-3.5 text-indigo-400" />
               ADMIN PANEL
             </Button>
