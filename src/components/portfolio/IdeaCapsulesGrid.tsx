@@ -20,11 +20,11 @@ export function IdeaCapsulesGrid({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-            <Atom className="w-5 h-5 text-cyan-400" />
+          <h3 className="text-lg font-bold font-display text-slate-100 flex items-center gap-2">
+            <Atom className="w-5 h-5 text-[#00f0ff]" />
             Zero-G Idea Capsules
           </h3>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-400 font-sans">
             Interactive physics concepts synchronized with the 3D WebGPU Rapier canvas
           </p>
         </div>
@@ -40,8 +40,8 @@ export function IdeaCapsulesGrid({
               onClick={() => onSelectCapsule?.(capsule.id)}
               className={`cursor-pointer transition-all duration-300 relative overflow-hidden group ${
                 isSelected
-                  ? "glass-panel-glow border-indigo-400 scale-[1.02]"
-                  : "glass-panel hover:border-slate-700 hover:scale-[1.01]"
+                  ? "hud-glass border-[#00f0ff] scale-[1.02] shadow-[0_0_25px_rgba(0,240,255,0.25)]"
+                  : "hud-glass hover:border-slate-700 hover:scale-[1.01]"
               }`}
             >
               <div
@@ -54,17 +54,17 @@ export function IdeaCapsulesGrid({
                   <Badge variant="purple" className="text-[10px]">
                     {capsule.category}
                   </Badge>
-                  <span className="text-[11px] font-mono text-cyan-400 flex items-center gap-1">
-                    <Zap className="w-3 h-3 text-cyan-400" />
+                  <span className="text-[11px] font-mono text-[#00f0ff] flex items-center gap-1">
+                    <Zap className="w-3 h-3 text-[#00f0ff]" />
                     Resonance: {capsule.metrics.resonance}%
                   </span>
                 </div>
 
-                <CardTitle className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
+                <CardTitle className="text-base font-bold font-display text-white group-hover:text-[#00f0ff] transition-colors">
                   {capsule.title}
                 </CardTitle>
 
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-xs text-slate-300 leading-relaxed font-sans">
                   {capsule.summary}
                 </p>
               </CardHeader>
@@ -76,7 +76,7 @@ export function IdeaCapsulesGrid({
                     Ignitions: {capsule.metrics.ignitions}
                   </span>
                   <span className="flex items-center gap-1">
-                    <Eye className="w-3 h-3 text-indigo-400" />
+                    <Eye className="w-3 h-3 text-[#8b5cf6]" />
                     Views: {capsule.metrics.views}
                   </span>
                   <span className="text-[10px] uppercase text-emerald-400">

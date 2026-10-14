@@ -48,14 +48,14 @@ export function LiveCommitTicker() {
   }, []);
 
   return (
-    <div className="w-full glass-panel rounded-2xl border-slate-800/80 p-4 relative overflow-hidden">
+    <div className="w-full hud-glass rounded-2xl border-slate-800/80 p-4 relative overflow-hidden shadow-2xl">
       <div className="flex items-center justify-between pb-3 border-b border-slate-800/60 mb-3">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">
+          <div className="p-1.5 rounded-lg bg-[#00f0ff]/10 text-[#00f0ff]">
             <GitCommit className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
+            <h4 className="text-sm font-bold font-display text-slate-100 flex items-center gap-2">
               Live GitHub Telemetry Stream
             </h4>
             <p className="text-[11px] font-mono text-slate-400">
@@ -65,13 +65,13 @@ export function LiveCommitTicker() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono bg-slate-900 border border-slate-800">
+          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono bg-slate-900/80 border border-slate-800">
             <span
               className={`w-2 h-2 rounded-full ${
-                connected ? "bg-emerald-400 animate-pulse" : "bg-cyan-400 animate-ping"
+                connected ? "bg-emerald-400 animate-pulse" : "bg-[#00f0ff] animate-ping"
               }`}
             />
-            <Radio className="w-3 h-3 text-cyan-400" />
+            <Radio className="w-3 h-3 text-[#00f0ff]" />
             {connected ? "STREAM LIVE" : "SSE READY"}
           </span>
         </div>
@@ -86,11 +86,11 @@ export function LiveCommitTicker() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
-              className="group flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-xl bg-slate-900/40 hover:bg-slate-900/80 border border-slate-800/60 hover:border-indigo-500/30 transition-all gap-2"
+              className="group flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-xl bg-slate-900/40 hover:bg-slate-900/80 border border-slate-800/60 hover:border-[#00f0ff]/30 transition-all gap-2"
             >
               <div className="flex items-start sm:items-center gap-2.5 min-w-0">
-                <div className="flex items-center gap-1 font-mono text-xs px-2 py-0.5 rounded bg-indigo-950/60 border border-indigo-800/40 text-indigo-300">
-                  <GitBranch className="w-3 h-3 text-indigo-400" />
+                <div className="flex items-center gap-1 font-mono text-xs px-2 py-0.5 rounded bg-[#8b5cf6]/15 border border-[#8b5cf6]/40 text-[#a78bfa]">
+                  <GitBranch className="w-3 h-3 text-[#00f0ff]" />
                   {commit.shortSha}
                 </div>
                 <div className="min-w-0">
@@ -98,7 +98,7 @@ export function LiveCommitTicker() {
                     {commit.message}
                   </p>
                   <p className="text-[10px] text-slate-400 font-mono flex items-center gap-2">
-                    <span className="text-cyan-400">{commit.repository}</span>
+                    <span className="text-[#00f0ff]">{commit.repository}</span>
                     <span>·</span>
                     <span>{commit.branch}</span>
                     <span>·</span>
@@ -125,7 +125,7 @@ export function LiveCommitTicker() {
                   href={commit.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-400 hover:text-indigo-400 p-1"
+                  className="text-slate-400 hover:text-[#00f0ff] p-1 transition-colors"
                 >
                   <ArrowUpRight className="w-3.5 h-3.5" />
                 </a>

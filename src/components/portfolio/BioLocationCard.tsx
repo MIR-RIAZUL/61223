@@ -23,14 +23,14 @@ interface BioLocationCardProps {
 
 export function BioLocationCard({ bio }: BioLocationCardProps) {
   return (
-    <Card className="glass-panel border-slate-800/80 shadow-2xl overflow-hidden relative group">
+    <Card className="hud-glass border-slate-800/80 shadow-2xl overflow-hidden relative group">
       {/* Subtle background glow */}
-      <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/20 transition-all duration-700" />
-      <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-cyan-500/20 transition-all duration-700" />
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#8b5cf6]/10 rounded-full blur-3xl pointer-events-none group-hover:bg-[#8b5cf6]/20 transition-all duration-700" />
+      <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-[#00f0ff]/10 rounded-full blur-3xl pointer-events-none group-hover:bg-[#00f0ff]/20 transition-all duration-700" />
 
       <CardHeader className="flex flex-row items-center gap-4 pb-4">
         <div className="relative">
-          <div className="w-16 h-16 rounded-2xl overflow-hidden border border-indigo-500/30 p-0.5 bg-gradient-to-tr from-indigo-500 to-cyan-400">
+          <div className="w-16 h-16 rounded-2xl overflow-hidden border border-[#00f0ff]/40 p-0.5 bg-gradient-to-tr from-[#8b5cf6] to-[#00f0ff] shadow-[0_0_15px_rgba(0,240,255,0.25)]">
             <Image
               src={bio.avatarUrl}
               alt={bio.name}
@@ -47,11 +47,11 @@ export function BioLocationCard({ bio }: BioLocationCardProps) {
 
         <div className="flex flex-col flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <CardTitle className="text-xl font-bold text-white tracking-tight">
+            <CardTitle className="text-xl font-bold text-white tracking-tight font-display text-glow-cyan">
               {bio.name}
             </CardTitle>
             <Badge variant="cyan">
-              <Orbit className="w-3 h-3 animate-spin text-cyan-400" />
+              <Orbit className="w-3 h-3 animate-spin text-[#00f0ff]" />
               {bio.status}
             </Badge>
           </div>
@@ -59,7 +59,7 @@ export function BioLocationCard({ bio }: BioLocationCardProps) {
             href={`https://github.com/${bio.handle}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-mono text-indigo-300 hover:text-cyan-300 truncate inline-flex items-center gap-1 transition-colors w-fit"
+            className="text-xs font-mono text-[#8b5cf6] hover:text-[#00f0ff] truncate inline-flex items-center gap-1 transition-colors w-fit"
           >
             @{bio.handle}
             <ExternalLink className="w-2.5 h-2.5" />
@@ -76,7 +76,7 @@ export function BioLocationCard({ bio }: BioLocationCardProps) {
         {/* Orbital Location Telemetry */}
         <div className="rounded-xl bg-slate-900/60 border border-slate-800/80 p-3.5 space-y-2.5">
           <div className="flex items-center justify-between text-xs text-slate-300 font-medium">
-            <span className="flex items-center gap-1.5 text-cyan-400 font-mono">
+            <span className="flex items-center gap-1.5 text-[#00f0ff] font-mono">
               <Satellite className="w-3.5 h-3.5" />
               TELEMETRY & GEOLOCATION
             </span>
@@ -107,7 +107,7 @@ export function BioLocationCard({ bio }: BioLocationCardProps) {
               <span className="text-slate-200 font-semibold truncate mt-0.5">
                 {bio.location.coordinates.latitude}° N, {bio.location.coordinates.longitude}° E
               </span>
-              <span className="text-[10px] text-cyan-400">
+              <span className="text-[10px] text-[#00f0ff]">
                 {bio.location.orbitalVelocityKmh.toLocaleString()} km/h · LEO
               </span>
             </div>
@@ -133,7 +133,7 @@ export function BioLocationCard({ bio }: BioLocationCardProps) {
           </div>
 
           <div className="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800/60 flex flex-col items-center">
-            <Layers className="w-3.5 h-3.5 text-cyan-400 mb-1" />
+            <Layers className="w-3.5 h-3.5 text-[#00f0ff] mb-1" />
             <span className="text-base font-bold text-white font-mono">
               {bio.stats.publicRepos}
             </span>
@@ -141,7 +141,7 @@ export function BioLocationCard({ bio }: BioLocationCardProps) {
           </div>
 
           <div className="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800/60 flex flex-col items-center">
-            <Activity className="w-3.5 h-3.5 text-indigo-400 mb-1" />
+            <Activity className="w-3.5 h-3.5 text-[#8b5cf6] mb-1" />
             <span className="text-base font-bold text-white font-mono">
               {bio.stats.experienceYears}y
             </span>
@@ -153,14 +153,14 @@ export function BioLocationCard({ bio }: BioLocationCardProps) {
         <div className="pt-2">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Globe2 className="w-3.5 h-3.5 text-indigo-400" />
+              <Globe2 className="w-3.5 h-3.5 text-[#8b5cf6]" />
               Core Competencies
             </span>
           </div>
           <div className="space-y-2">
             {bio.skills.map((skillGroup) => (
               <div key={skillGroup.category} className="space-y-1">
-                <span className="text-[10px] font-mono uppercase text-cyan-400 font-semibold">
+                <span className="text-[10px] font-mono uppercase text-[#00f0ff] font-semibold">
                   {skillGroup.category}
                 </span>
                 <div className="flex flex-wrap gap-1.5">

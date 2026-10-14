@@ -117,14 +117,14 @@ export function FloatingCapsule({
           <div
             className={`flex flex-col items-center px-3 py-1.5 rounded-lg border backdrop-blur-md transition-all duration-300 ${
               hovered
-                ? "bg-slate-900/90 border-indigo-400 scale-110 shadow-[0_0_15px_rgba(99,102,241,0.5)]"
-                : "bg-slate-950/60 border-slate-700/60 scale-95"
+                ? "hud-glass border-[#00f0ff] scale-110 shadow-[0_0_15px_rgba(0,240,255,0.4)]"
+                : "bg-slate-950/70 border-slate-700/60 scale-95"
             }`}
           >
-            <span className="text-[10px] uppercase font-mono tracking-wider text-cyan-400">
+            <span className="text-[10px] uppercase font-mono tracking-wider text-[#00f0ff]">
               {category}
             </span>
-            <span className="text-xs font-semibold text-slate-100 whitespace-nowrap">
+            <span className="text-xs font-semibold font-display text-slate-100 whitespace-nowrap">
               {title}
             </span>
           </div>

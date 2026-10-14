@@ -1,7 +1,7 @@
-import * as React from "react";
+import { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: "default" | "cyan" | "purple" | "emerald" | "amber" | "outline";
 }
 
@@ -12,12 +12,12 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const variantStyles = {
-    default: "bg-indigo-950/70 text-indigo-300 border-indigo-700/50",
-    cyan: "bg-cyan-950/70 text-cyan-300 border-cyan-700/50 shadow-[0_0_10px_rgba(6,182,212,0.15)]",
-    purple: "bg-purple-950/70 text-purple-300 border-purple-700/50 shadow-[0_0_10px_rgba(168,85,247,0.15)]",
-    emerald: "bg-emerald-950/70 text-emerald-300 border-emerald-700/50",
-    amber: "bg-amber-950/70 text-amber-300 border-amber-700/50",
-    outline: "border-slate-700/70 text-slate-300 bg-slate-900/40",
+    default: "bg-[#8b5cf6]/15 text-[#a78bfa] border-[#8b5cf6]/40 shadow-[0_0_10px_rgba(139,92,246,0.15)]",
+    cyan: "bg-[#00f0ff]/10 text-[#00f0ff] border-[#00f0ff]/40 shadow-[0_0_12px_rgba(0,240,255,0.2)]",
+    purple: "bg-[#8b5cf6]/10 text-[#a78bfa] border-[#8b5cf6]/40 shadow-[0_0_12px_rgba(139,92,246,0.2)]",
+    emerald: "bg-[#10b981]/10 text-[#34d399] border-[#10b981]/40 shadow-[0_0_12px_rgba(16,185,129,0.2)]",
+    amber: "bg-[#f59e0b]/10 text-[#fbbf24] border-[#f59e0b]/40 shadow-[0_0_12px_rgba(245,158,11,0.2)]",
+    outline: "border-slate-800 text-slate-300 bg-slate-950/60",
   };
 
   return (

@@ -25,7 +25,7 @@ const AntiGravityCanvas = dynamic(
     loading: () => (
       <div className="w-full h-full flex flex-col items-center justify-center bg-[#050508] text-slate-400 gap-3">
         <div className="w-8 h-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
-        <span className="text-xs font-mono text-cyan-400 tracking-widest uppercase">
+        <span className="text-xs font-mono text-[#00f0ff] tracking-widest uppercase">
           Synthesizing Zero-G Mesh...
         </span>
       </div>
@@ -58,11 +58,11 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
       <div className="absolute top-4 left-4 right-4 z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto flex-wrap">
           <Badge variant="cyan" className="py-1 px-3">
-            <Orbit className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
+            <Orbit className="w-3.5 h-3.5 text-[#00f0ff] animate-spin" />
             <span className="font-mono">RIAZUL // DEadEnD</span>
           </Badge>
           <Badge variant="purple" className="py-1 px-3 hidden md:inline-flex">
-            <Cpu className="w-3.5 h-3.5 text-purple-400" />
+            <Cpu className="w-3.5 h-3.5 text-[#8b5cf6]" />
             <span className="font-mono">FLUTTER & WEBGPU ARCHITECTURE</span>
           </Badge>
           <Badge variant="emerald" className="py-1 px-2.5 hidden sm:inline-flex text-[11px] font-mono">
@@ -91,20 +91,20 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
         </div>
       </div>
 
-      {/* Bottom Hero Callout Banner */}
+      {/* Bottom Hero Callout Banner with HUD Glass */}
       <div className="absolute bottom-4 left-4 right-4 z-10 pointer-events-none">
-        <div className="glass-panel rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pointer-events-auto border-indigo-500/30">
+        <div className="hud-glass rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pointer-events-auto border-[#00f0ff]/25 shadow-[0_0_30px_rgba(0,240,255,0.15)]">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[11px] font-mono tracking-widest text-emerald-400 uppercase">
+              <span className="text-[11px] font-mono tracking-widest text-[#00f0ff] uppercase">
                 RIAZUL // CALLSIGN: DEadEnD
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight font-display text-glow-cyan">
               Full-Stack Web, Mobile Apps & Zero-Gravity Physics
             </h1>
-            <p className="text-xs text-slate-300 max-w-xl">
+            <p className="text-xs text-slate-300 max-w-xl font-sans">
               Engineered with Cross-Platform Flutter, Next.js WebGPU, and Rust WebAssembly physics.
               Live telemetry anchored from Badda, Dhaka, Bangladesh.
             </p>
@@ -118,7 +118,7 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
                 const el = document.getElementById("projects-section");
                 el?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="text-xs"
+              className="text-xs font-mono"
             >
               Explore Ecosystem
               <ChevronRight className="w-3.5 h-3.5 ml-1" />

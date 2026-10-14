@@ -15,12 +15,12 @@ export function ProjectShowcase({ projects }: ProjectShowcaseProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-            <Code2 className="w-5 h-5 text-indigo-400" />
+          <h3 className="text-lg font-bold font-display text-slate-100 flex items-center gap-2">
+            <Code2 className="w-5 h-5 text-[#00f0ff]" />
             Core Engineered Repositories
           </h3>
-          <p className="text-xs text-slate-400">
-            High-velocity systems, WebGPU pipelines, and distributed zero-gravity runtimes
+          <p className="text-xs text-slate-400 font-sans">
+            Cross-platform Flutter engines, Next.js WebGPU architectures, and real-time mesh pipelines
           </p>
         </div>
       </div>
@@ -29,13 +29,13 @@ export function ProjectShowcase({ projects }: ProjectShowcaseProps) {
         {projects.map((project) => (
           <Card
             key={project.id}
-            className="glass-panel border-slate-800/80 hover:border-indigo-500/40 transition-all duration-300 flex flex-col justify-between group"
+            className="hud-glass border-slate-800/80 hover:border-[#00f0ff]/40 transition-all duration-300 flex flex-col justify-between group shadow-xl"
           >
             <CardHeader className="space-y-2">
               <div className="flex items-center justify-between">
                 <Badge
                   variant={
-                    project.language === "Rust"
+                    project.language === "Dart" || project.language === "Rust"
                       ? "amber"
                       : project.language === "TypeScript"
                       ? "cyan"
@@ -56,11 +56,11 @@ export function ProjectShowcase({ projects }: ProjectShowcaseProps) {
                 </div>
               </div>
 
-              <CardTitle className="text-base font-bold text-white group-hover:text-indigo-300 transition-colors">
+              <CardTitle className="text-base font-bold font-display text-white group-hover:text-[#00f0ff] transition-colors">
                 {project.name}
               </CardTitle>
 
-              <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">
+              <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed font-sans">
                 {project.description}
               </p>
             </CardHeader>
@@ -70,7 +70,7 @@ export function ProjectShowcase({ projects }: ProjectShowcaseProps) {
                 {project.topics.slice(0, 4).map((topic) => (
                   <span
                     key={topic}
-                    className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-[10px] font-mono text-slate-300"
+                    className="px-2 py-0.5 rounded-md bg-slate-900/80 border border-slate-800 text-[10px] font-mono text-slate-300"
                   >
                     #{topic}
                   </span>
@@ -78,8 +78,8 @@ export function ProjectShowcase({ projects }: ProjectShowcaseProps) {
               </div>
 
               <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between">
-                <span className="text-[10px] font-mono text-cyan-400 flex items-center gap-1">
-                  <ShieldAlert className="w-3 h-3 text-cyan-400" />
+                <span className="text-[10px] font-mono text-[#00f0ff] flex items-center gap-1">
+                  <ShieldAlert className="w-3 h-3 text-[#00f0ff]" />
                   Health: {project.metrics.healthScore}%
                 </span>
 
@@ -87,7 +87,7 @@ export function ProjectShowcase({ projects }: ProjectShowcaseProps) {
                   size="sm"
                   variant="outline"
                   onClick={() => window.open(project.htmlUrl, "_blank")}
-                  className="text-xs h-7"
+                  className="text-xs h-7 font-mono hover:text-[#00f0ff] hover:border-[#00f0ff]/50"
                 >
                   Explore Repo
                   <ExternalLink className="w-3 h-3 ml-1" />

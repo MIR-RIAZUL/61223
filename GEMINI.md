@@ -25,3 +25,4 @@
    - Glassmorphism, neon HUD accents, and zero-gravity physical interactions.
 4. **Execution Protocol**:
    - Execute strictly one step at a time with verified compilation.
+   - After every step passes `npx tsc --noEmit`, automatically stage all files and create a descriptive Git commit formatted as `git add -A && git commit -m 'feat(step-XX): <concise description of changes>'`.
