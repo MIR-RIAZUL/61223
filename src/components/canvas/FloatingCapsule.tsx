@@ -30,8 +30,10 @@ export function FloatingCapsule({
   const rigidBodyRef = useRef<RapierRigidBody>(null);
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
-  const { isZeroGravity, shockwaveCount } = useGravity();
+  const { isZeroGravity, shockwaveCount, selectedCapsuleId, selectCapsule } = useGravity();
   const lastShockwaveRef = useRef(shockwaveCount);
+
+  const isSelected = selectedCapsuleId === id;
 
   // Broadcast kinetic shockwave impulse across all capsules
   useEffect(() => {
@@ -90,7 +92,7 @@ export function FloatingCapsule({
 
   const handlePointerDown = () => {
     if (rigidBodyRef.current) {
-      // Apply random energetic impulse on click
+      // Apply energetic impulse on click
       const impulseX = (Math.random() - 0.5) * 3;
       const impulseY = Math.random() * 2 + 1;
       const impulseZ = (Math.random() - 0.5) * 3;
@@ -107,6 +109,8 @@ export function FloatingCapsule({
         true
       );
     }
+    // Select this capsule in global GravityContext and notify parent
+    selectCapsule(id);
     onSelect?.(id);
   };
 
@@ -130,35 +134,50 @@ export function FloatingCapsule({
         <mesh ref={meshRef} castShadow receiveShadow>
           <capsuleGeometry args={[0.45, 0.9, 16, 32]} />
           <meshStandardMaterial
-            color={hovered ? "#ffffff" : color}
-            roughness={0.25}
-            metalness={0.8}
-            emissive={color}
-            emissiveIntensity={hovered ? 0.9 : 0.35}
+            color={isSelected ? "#00f0ff" : hovered ? "#ffffff" : color}
+            roughness={0.22}
+            metalness={0.85}
+            emissive={isSelected ? "#00f0ff" : color}
+            emissiveIntensity={isSelected ? 1.5 : hovered ? 0.9 : 0.35}
           />
         </mesh>
 
         {/* Ambient Orbit Glow Rings */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.7, 0.75, 32]} />
+          <ringGeometry args={[0.7, 0.76, 32]} />
           <meshBasicMaterial
-            color={color}
+            color={isSelected ? "#00f0ff" : color}
             side={THREE.DoubleSide}
             transparent
-            opacity={hovered ? 0.8 : 0.3}
+            opacity={isSelected ? 1.0 : hovered ? 0.8 : 0.3}
           />
         </mesh>
 
+        {/* Selected Highlight Outer Resonance Halo */}
+        {isSelected && (
+          <mesh rotation={[Math.PI / 4, Math.PI / 4, 0]}>
+            <ringGeometry args={[0.85, 0.92, 32]} />
+            <meshBasicMaterial
+              color="#00f0ff"
+              side={THREE.DoubleSide}
+              transparent
+              opacity={0.85}
+            />
+          </mesh>
+        )}
+
         {/* Floating HTML Annotation */}
         <Html
-          position={[0, 1.1, 0]}
+          position={[0, 1.15, 0]}
           center
           distanceFactor={10}
           className="pointer-events-none select-none transition-all duration-300"
         >
           <div
             className={`flex flex-col items-center px-3 py-1.5 rounded-lg border backdrop-blur-md transition-all duration-300 ${
-              hovered
+              isSelected
+                ? "hud-glass border-[#00f0ff] scale-125 shadow-[0_0_25px_rgba(0,240,255,0.7)] ring-1 ring-[#00f0ff]"
+                : hovered
                 ? "hud-glass border-[#00f0ff] scale-110 shadow-[0_0_15px_rgba(0,240,255,0.4)]"
                 : "bg-slate-950/70 border-slate-700/60 scale-95"
             }`}

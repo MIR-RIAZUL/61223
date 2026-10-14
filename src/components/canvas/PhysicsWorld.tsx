@@ -3,6 +3,7 @@
 import { Physics, CuboidCollider } from "@react-three/rapier";
 import { SpaceBackground } from "./SpaceBackground";
 import { FloatingCapsule } from "./FloatingCapsule";
+import { CursorForceField } from "./CursorForceField";
 import { INITIAL_IDEA_CAPSULES } from "@/lib/db";
 import { PHYSICS_BOUNDS } from "@/lib/physics";
 import { useGravity } from "@/context/GravityContext";
@@ -68,6 +69,9 @@ export function PhysicsWorld({
           args={[20, 20, 1]}
           restitution={0.9}
         />
+
+        {/* 3D Kinematic Cursor Force-Field */}
+        <CursorForceField />
 
         {/* Floating zero-gravity idea capsules */}
         {INITIAL_IDEA_CAPSULES.map((capsule, index) => {

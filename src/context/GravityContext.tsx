@@ -11,6 +11,10 @@ export interface GravityContextType {
   updatePhysicsConfig: (partial: Partial<PhysicsConfig>) => void;
   shockwaveCount: number;
   triggerShockwave: () => void;
+  cursorForceEnabled: boolean;
+  toggleCursorForce: () => void;
+  selectedCapsuleId: string | null;
+  selectCapsule: (id: string | null) => void;
 }
 
 const GravityContext = createContext<GravityContextType | null>(null);
@@ -18,6 +22,8 @@ const GravityContext = createContext<GravityContextType | null>(null);
 export function GravityProvider({ children }: { children: React.ReactNode }) {
   const [physicsConfig, setPhysicsConfig] = useState<PhysicsConfig>(DEFAULT_PHYSICS_CONFIG);
   const [shockwaveCount, setShockwaveCount] = useState<number>(0);
+  const [cursorForceEnabled, setCursorForceEnabled] = useState<boolean>(true);
+  const [selectedCapsuleId, setSelectedCapsuleId] = useState<string | null>(null);
 
   const isZeroGravity = useMemo(
     () => physicsConfig.gravity[1] === 0,
@@ -49,6 +55,14 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
     setShockwaveCount((prev) => prev + 1);
   }, []);
 
+  const toggleCursorForce = useCallback(() => {
+    setCursorForceEnabled((prev) => !prev);
+  }, []);
+
+  const selectCapsule = useCallback((id: string | null) => {
+    setSelectedCapsuleId(id);
+  }, []);
+
   const value = useMemo(
     () => ({
       physicsConfig,
@@ -57,6 +71,10 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
       updatePhysicsConfig,
       shockwaveCount,
       triggerShockwave,
+      cursorForceEnabled,
+      toggleCursorForce,
+      selectedCapsuleId,
+      selectCapsule,
     }),
     [
       physicsConfig,
@@ -65,6 +83,10 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
       updatePhysicsConfig,
       shockwaveCount,
       triggerShockwave,
+      cursorForceEnabled,
+      toggleCursorForce,
+      selectedCapsuleId,
+      selectCapsule,
     ]
   );
 

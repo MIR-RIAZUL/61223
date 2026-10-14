@@ -5,14 +5,17 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useGravity } from "@/context/GravityContext";
+import { INITIAL_IDEA_CAPSULES } from "@/lib/db";
 import { 
   Orbit, 
   Cpu, 
-  ChevronRight,
-  Move3d,
-  Terminal,
-  Sparkles,
-  Zap
+  ChevronRight, 
+  Move3d, 
+  Terminal, 
+  Sparkles, 
+  Zap, 
+  Radio, 
+  X 
 } from "lucide-react";
 
 // Dynamically import the AntiGravityCanvas to prevent SSR window/webgl evaluation
@@ -39,7 +42,20 @@ interface HeroViewportProps {
 }
 
 export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
-  const { isZeroGravity, toggleZeroGravity, triggerShockwave, physicsConfig } = useGravity();
+  const { 
+    isZeroGravity, 
+    toggleZeroGravity, 
+    triggerShockwave, 
+    physicsConfig,
+    cursorForceEnabled,
+    toggleCursorForce,
+    selectedCapsuleId,
+    selectCapsule
+  } = useGravity();
+
+  const activeCapsule = INITIAL_IDEA_CAPSULES.find(
+    (c) => c.id === selectedCapsuleId
+  );
 
   return (
     <div className="relative w-full rounded-3xl overflow-hidden border border-slate-800/80 bg-[#050508] shadow-[0_0_50px_rgba(0,0,0,0.8)]">
@@ -68,7 +84,20 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
           </Badge>
         </div>
 
-        <div className="flex items-center gap-2 pointer-events-auto">
+        <div className="flex items-center gap-2 pointer-events-auto flex-wrap">
+          {/* 3D Cursor Force Field Toggle */}
+          <Button
+            size="sm"
+            variant={cursorForceEnabled ? "glow" : "outline"}
+            onClick={toggleCursorForce}
+            className="text-xs font-mono gap-1"
+            title="Toggle 3D Kinematic Cursor Force-Field"
+          >
+            <Radio className={`w-3.5 h-3.5 ${cursorForceEnabled ? "text-[#00f0ff] animate-pulse" : "text-slate-400"}`} />
+            <span>{cursorForceEnabled ? "FORCE FIELD: ON" : "FORCE FIELD: OFF"}</span>
+          </Button>
+
+          {/* Kinetic Shockwave Impulse Trigger */}
           <Button
             size="sm"
             variant="outline"
@@ -80,6 +109,7 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
             PULSE WAVE
           </Button>
 
+          {/* Zero-G Toggle */}
           <Button
             size="sm"
             variant={isZeroGravity ? "glow" : "outline"}
@@ -90,6 +120,7 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
             {isZeroGravity ? "0G WEIGHTLESS" : "1G LOCKED"}
           </Button>
 
+          {/* Admin Panel Link */}
           <Link href="/admin">
             <Button size="sm" variant="outline" className="text-xs font-mono gap-1">
               <Terminal className="w-3.5 h-3.5 text-indigo-400" />
@@ -98,6 +129,55 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
           </Link>
         </div>
       </div>
+
+      {/* Interactive HUD Capsule Telemetry Inspector */}
+      {activeCapsule && (
+        <div className="absolute top-20 right-4 z-20 w-72 sm:w-80 hud-glass rounded-2xl p-4 border-[#00f0ff]/30 shadow-[0_0_30px_rgba(0,240,255,0.25)] animate-in fade-in duration-300">
+          <div className="flex items-start justify-between gap-2 pb-2 border-b border-slate-800">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#00f0ff]">
+                CAPSULE TELEMETRY // {activeCapsule.category}
+              </span>
+              <h4 className="text-sm font-bold font-display text-white">
+                {activeCapsule.title}
+              </h4>
+            </div>
+            <button
+              onClick={() => selectCapsule(null)}
+              className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+              aria-label="Close Inspector"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <p className="text-xs text-slate-300 mt-2 line-clamp-2">
+            {activeCapsule.summary}
+          </p>
+
+          <div className="grid grid-cols-2 gap-2 mt-3 text-[11px] font-mono">
+            <div className="p-2 rounded-lg bg-slate-900/70 border border-slate-800">
+              <span className="text-slate-400 block text-[10px]">MASS</span>
+              <span className="text-white font-semibold">{activeCapsule.metrics.mass} kg</span>
+            </div>
+            <div className="p-2 rounded-lg bg-slate-900/70 border border-slate-800">
+              <span className="text-slate-400 block text-[10px]">RESONANCE</span>
+              <span className="text-[#00f0ff] font-semibold">{activeCapsule.metrics.resonance}%</span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-1 mt-3">
+            {activeCapsule.tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#00f0ff]/10 text-[#00f0ff] border border-[#00f0ff]/20"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Bottom Hero Callout Banner with HUD Glass */}
       <div className="absolute bottom-4 left-4 right-4 z-10 pointer-events-none">
