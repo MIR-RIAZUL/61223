@@ -5,6 +5,7 @@ import { SpaceBackground } from "./SpaceBackground";
 import { FloatingCapsule } from "./FloatingCapsule";
 import { INITIAL_IDEA_CAPSULES } from "@/lib/db";
 import { PHYSICS_BOUNDS } from "@/lib/physics";
+import { useGravity } from "@/context/GravityContext";
 
 interface PhysicsWorldProps {
   onSelectCapsule?: (id: string) => void;
@@ -13,8 +14,10 @@ interface PhysicsWorldProps {
 
 export function PhysicsWorld({
   onSelectCapsule,
-  gravity = [0, 0, 0],
+  gravity,
 }: PhysicsWorldProps) {
+  const { physicsConfig } = useGravity();
+  const effectiveGravity = gravity ?? physicsConfig.gravity;
   return (
     <>
       {/* Lighting Configuration for deep space aesthetic */}
@@ -27,7 +30,7 @@ export function PhysicsWorld({
       <SpaceBackground />
 
       {/* Rapier WASM Physics Engine Provider */}
-      <Physics gravity={gravity} timeStep={1 / 60}>
+      <Physics gravity={effectiveGravity} timeStep={1 / 60}>
         {/* Invisible Zero-G Boundary Containment Colliders */}
         {/* Floor */}
         <CuboidCollider

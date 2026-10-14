@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { RigidBody, RapierRigidBody } from "@react-three/rapier";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import { calculateRestoringForce } from "@/lib/physics";
+import { useGravity } from "@/context/GravityContext";
 
 interface FloatingCapsuleProps {
   id: string;
@@ -29,20 +30,61 @@ export function FloatingCapsule({
   const rigidBodyRef = useRef<RapierRigidBody>(null);
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
+  const { isZeroGravity, shockwaveCount } = useGravity();
+  const lastShockwaveRef = useRef(shockwaveCount);
+
+  // Broadcast kinetic shockwave impulse across all capsules
+  useEffect(() => {
+    if (shockwaveCount > 0 && shockwaveCount !== lastShockwaveRef.current) {
+      lastShockwaveRef.current = shockwaveCount;
+      if (rigidBodyRef.current) {
+        rigidBodyRef.current.wakeUp();
+        const translation = rigidBodyRef.current.translation();
+        const dist = Math.sqrt(
+          translation.x ** 2 + translation.y ** 2 + translation.z ** 2
+        ) || 1;
+        const radialMultiplier = 6.0 + Math.random() * 3.0;
+
+        rigidBodyRef.current.applyImpulse(
+          {
+            x: (translation.x / dist) * radialMultiplier + (Math.random() - 0.5) * 4,
+            y: Math.random() * 5 + 3.5,
+            z: (translation.z / dist) * radialMultiplier + (Math.random() - 0.5) * 4,
+          },
+          true
+        );
+        rigidBodyRef.current.applyTorqueImpulse(
+          {
+            x: (Math.random() - 0.5) * 3,
+            y: (Math.random() - 0.5) * 3,
+            z: (Math.random() - 0.5) * 3,
+          },
+          true
+        );
+      }
+    } else {
+      lastShockwaveRef.current = shockwaveCount;
+    }
+  }, [shockwaveCount]);
 
   useFrame(() => {
     if (!rigidBodyRef.current) return;
 
-    // Apply zero-g restorative force if capsule floats too far away
-    const translation = rigidBodyRef.current.translation();
-    const [fx, fy, fz] = calculateRestoringForce([
-      translation.x,
-      translation.y,
-      translation.z,
-    ]);
+    // Apply zero-g restorative force if capsule floats too far away in zero-g mode
+    if (isZeroGravity) {
+      const translation = rigidBodyRef.current.translation();
+      const [fx, fy, fz] = calculateRestoringForce([
+        translation.x,
+        translation.y,
+        translation.z,
+      ]);
 
-    if (fx !== 0 || fy !== 0 || fz !== 0) {
-      rigidBodyRef.current.applyImpulse({ x: fx * 0.05, y: fy * 0.05, z: fz * 0.05 }, true);
+      if (fx !== 0 || fy !== 0 || fz !== 0) {
+        rigidBodyRef.current.applyImpulse(
+          { x: fx * 0.05, y: fy * 0.05, z: fz * 0.05 },
+          true
+        );
+      }
     }
   });
 

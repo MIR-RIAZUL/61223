@@ -1,17 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useGravity } from "@/context/GravityContext";
 import { 
   Orbit, 
   Cpu, 
   ChevronRight,
   Move3d,
   Terminal,
-  Sparkles
+  Sparkles,
+  Zap
 } from "lucide-react";
 
 // Dynamically import the AntiGravityCanvas to prevent SSR window/webgl evaluation
@@ -38,11 +39,7 @@ interface HeroViewportProps {
 }
 
 export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
-  const [zeroGravity, setZeroGravity] = useState(true);
-
-  const toggleGravity = () => {
-    setZeroGravity((prev) => !prev);
-  };
+  const { isZeroGravity, toggleZeroGravity, triggerShockwave, physicsConfig } = useGravity();
 
   return (
     <div className="relative w-full rounded-3xl overflow-hidden border border-slate-800/80 bg-[#050508] shadow-[0_0_50px_rgba(0,0,0,0.8)]">
@@ -50,7 +47,7 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
       <div className="w-full h-[540px] relative z-0">
         <AntiGravityCanvas
           onSelectCapsule={onSelectCapsule}
-          gravity={zeroGravity ? [0, 0, 0] : [0, -4.5, 0]}
+          gravity={physicsConfig.gravity}
         />
       </div>
 
@@ -74,12 +71,23 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
         <div className="flex items-center gap-2 pointer-events-auto">
           <Button
             size="sm"
-            variant={zeroGravity ? "glow" : "outline"}
-            onClick={toggleGravity}
-            className="text-xs font-mono"
+            variant="outline"
+            onClick={triggerShockwave}
+            className="text-xs font-mono gap-1 text-[#00f0ff] border-[#00f0ff]/40 hover:bg-[#00f0ff]/10"
+            title="Broadcast kinetic shockwave impulse"
+          >
+            <Zap className="w-3.5 h-3.5 text-[#00f0ff]" />
+            PULSE WAVE
+          </Button>
+
+          <Button
+            size="sm"
+            variant={isZeroGravity ? "glow" : "outline"}
+            onClick={toggleZeroGravity}
+            className="text-xs font-mono gap-1"
           >
             <Move3d className="w-3.5 h-3.5" />
-            {zeroGravity ? "ZERO-G: ACTIVE" : "MICRO-G: RESTORE"}
+            {isZeroGravity ? "0G WEIGHTLESS" : "1G LOCKED"}
           </Button>
 
           <Link href="/admin">
@@ -115,7 +123,7 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
               variant="default"
               size="sm"
               onClick={() => {
-                const el = document.getElementById("projects-section");
+                const el = document.getElementById("projects") || document.getElementById("projects-section");
                 el?.scrollIntoView({ behavior: "smooth" });
               }}
               className="text-xs font-mono"

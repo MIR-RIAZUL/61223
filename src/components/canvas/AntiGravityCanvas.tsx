@@ -12,7 +12,7 @@ interface AntiGravityCanvasProps {
 
 export function AntiGravityCanvas({
   onSelectCapsule,
-  gravity = [0, 0, 0],
+  gravity,
 }: AntiGravityCanvasProps) {
   const [mounted, setMounted] = useState(false);
 
