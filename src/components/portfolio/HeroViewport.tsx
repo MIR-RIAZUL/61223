@@ -10,7 +10,8 @@ import {
   Cpu, 
   ChevronRight,
   Move3d,
-  Terminal
+  Terminal,
+  Sparkles
 } from "lucide-react";
 
 // Dynamically import the AntiGravityCanvas to prevent SSR window/webgl evaluation
@@ -55,14 +56,18 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
 
       {/* Futuristic Floating HUD Overlays */}
       <div className="absolute top-4 left-4 right-4 z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pointer-events-none">
-        <div className="flex items-center gap-2 pointer-events-auto">
+        <div className="flex items-center gap-2 pointer-events-auto flex-wrap">
           <Badge variant="cyan" className="py-1 px-3">
             <Orbit className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
-            <span className="font-mono">RUST RAPIER WASM v2.2</span>
+            <span className="font-mono">RIAZUL // DEadEnD</span>
           </Badge>
           <Badge variant="purple" className="py-1 px-3 hidden md:inline-flex">
             <Cpu className="w-3.5 h-3.5 text-purple-400" />
-            <span className="font-mono">WEBGPU PIPELINE READY</span>
+            <span className="font-mono">FLUTTER & WEBGPU ARCHITECTURE</span>
+          </Badge>
+          <Badge variant="emerald" className="py-1 px-2.5 hidden sm:inline-flex text-[11px] font-mono">
+            <Sparkles className="w-3 h-3 text-emerald-400 mr-1" />
+            DHAKA (UTC+6)
           </Badge>
         </div>
 
@@ -93,15 +98,15 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-[11px] font-mono tracking-widest text-emerald-400 uppercase">
-                Anti-Gravity Simulation Engine
+                RIAZUL // CALLSIGN: DEadEnD
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              Next-Gen Spatial Computing & Physics Portfolio
+              Full-Stack Web, Mobile Apps & Zero-Gravity Physics
             </h1>
             <p className="text-xs text-slate-300 max-w-xl">
-              Interact with the zero-gravity floating bodies using cursor drag or impulses.
-              Simulated with Rust WebAssembly physics in an ultra-dark space theme.
+              Engineered with Cross-Platform Flutter, Next.js WebGPU, and Rust WebAssembly physics.
+              Live telemetry anchored from Badda, Dhaka, Bangladesh.
             </p>
           </div>
 
@@ -115,7 +120,7 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
               }}
               className="text-xs"
             >
-              Explore Systems
+              Explore Ecosystem
               <ChevronRight className="w-3.5 h-3.5 ml-1" />
             </Button>
           </div>

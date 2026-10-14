@@ -12,7 +12,9 @@ import {
   Activity, 
   Compass, 
   Sparkles,
-  Layers
+  Layers,
+  MapPin,
+  ExternalLink
 } from "lucide-react";
 
 interface BioLocationCardProps {
@@ -53,7 +55,15 @@ export function BioLocationCard({ bio }: BioLocationCardProps) {
               {bio.status}
             </Badge>
           </div>
-          <p className="text-xs font-mono text-indigo-300 truncate">@{bio.handle}</p>
+          <a
+            href={`https://github.com/${bio.handle}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-mono text-indigo-300 hover:text-cyan-300 truncate inline-flex items-center gap-1 transition-colors w-fit"
+          >
+            @{bio.handle}
+            <ExternalLink className="w-2.5 h-2.5" />
+          </a>
           <p className="text-xs text-slate-400 mt-0.5 font-medium">{bio.role}</p>
         </div>
       </CardHeader>
@@ -68,27 +78,37 @@ export function BioLocationCard({ bio }: BioLocationCardProps) {
           <div className="flex items-center justify-between text-xs text-slate-300 font-medium">
             <span className="flex items-center gap-1.5 text-cyan-400 font-mono">
               <Satellite className="w-3.5 h-3.5" />
-              ORBIT TELEMETRY
+              TELEMETRY & GEOLOCATION
             </span>
-            <span className="text-[11px] font-mono text-slate-400">
+            <span className="text-[11px] font-mono text-emerald-400">
               {bio.location.timezone}
             </span>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-            <div className="flex flex-col bg-slate-950/50 p-2 rounded-lg border border-slate-800/60">
-              <span className="text-[10px] text-slate-400 uppercase">Location Station</span>
-              <span className="text-slate-200 font-semibold truncate flex items-center gap-1">
-                <Globe2 className="w-3 h-3 text-indigo-400" />
+            <div className="flex flex-col bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60">
+              <span className="text-[10px] text-slate-400 uppercase flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-rose-400" />
+                Station Base
+              </span>
+              <span className="text-slate-200 font-semibold truncate mt-0.5">
                 {bio.location.city}
+              </span>
+              <span className="text-[10px] text-slate-400">
+                {bio.location.country} ({bio.location.countryCode})
               </span>
             </div>
 
-            <div className="flex flex-col bg-slate-950/50 p-2 rounded-lg border border-slate-800/60">
-              <span className="text-[10px] text-slate-400 uppercase">Velocity & Altitude</span>
-              <span className="text-slate-200 font-semibold truncate flex items-center gap-1">
+            <div className="flex flex-col bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60">
+              <span className="text-[10px] text-slate-400 uppercase flex items-center gap-1">
                 <Compass className="w-3 h-3 text-emerald-400" />
-                {bio.location.orbitalVelocityKmh.toLocaleString()} km/h · {bio.location.coordinates.altitudeKm} km
+                Coordinates & Velocity
+              </span>
+              <span className="text-slate-200 font-semibold truncate mt-0.5">
+                {bio.location.coordinates.latitude}° N, {bio.location.coordinates.longitude}° E
+              </span>
+              <span className="text-[10px] text-cyan-400">
+                {bio.location.orbitalVelocityKmh.toLocaleString()} km/h · LEO
               </span>
             </div>
           </div>
@@ -132,15 +152,25 @@ export function BioLocationCard({ bio }: BioLocationCardProps) {
         {/* Skills Tag Cloud */}
         <div className="pt-2">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">
-              Specialized Core
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+              <Globe2 className="w-3.5 h-3.5 text-indigo-400" />
+              Core Competencies
             </span>
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {bio.skills.flatMap((s) => s.items).slice(0, 8).map((skill) => (
-              <Badge key={skill} variant="outline" className="text-[11px] py-0.5">
-                {skill}
-              </Badge>
+          <div className="space-y-2">
+            {bio.skills.map((skillGroup) => (
+              <div key={skillGroup.category} className="space-y-1">
+                <span className="text-[10px] font-mono uppercase text-cyan-400 font-semibold">
+                  {skillGroup.category}
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {skillGroup.items.map((item) => (
+                    <Badge key={item} variant="outline" className="text-[11px] py-0.5">
+                      {item}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>

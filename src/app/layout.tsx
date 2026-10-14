@@ -13,9 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Antigravity // Zero-G Spatial Computing & WASM Physics",
+  title: "RIAZUL // DEadEnD — Anti-Gravity Portfolio",
   description:
-    "Next-gen spatial computing portfolio powered by Three.js WebGPU, Rust Rapier WASM physics, and live GitHub commit streaming.",
+    "Full-Stack Web, App & Cross-Platform Flutter Architect portfolio powered by Three.js WebGPU, Rust Rapier WASM zero-gravity physics, and live GitHub ecosystem telemetry.",
+  icons: {
+    icon: "https://github.com/MIR-RIAZUL.png",
+  },
 };
 
 export default function RootLayout({

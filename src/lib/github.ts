@@ -1,5 +1,9 @@
 import { GithubProject, LiveGithubCommit } from "@/types";
 
+export const DEFAULT_GITHUB_USERNAME = "MIR-RIAZUL";
+export const DEFAULT_GITHUB_AVATAR = "https://github.com/MIR-RIAZUL.png";
+export const DEFAULT_GITHUB_PROFILE_URL = "https://github.com/MIR-RIAZUL";
+
 /**
  * Format raw GitHub webhook payload into standardized LiveGithubCommit domain model.
  */
@@ -15,34 +19,37 @@ export function parseGithubWebhookCommit(
 
     const sha = (headCommit.id as string) || `commit-${Date.now().toString(16)}`;
     const shortSha = sha.substring(0, 7);
-    const message = (headCommit.message as string) || "Manual telemetry sync commit";
+    const message = (headCommit.message as string) || "Telemetry synchronization commit";
     const authorName =
       ((headCommit.author as Record<string, unknown>)?.name as string) ||
       (sender.login as string) ||
-      "Antigravity Architect";
+      "RIAZUL";
 
     const avatarUrl =
-      (sender.avatar_url as string) ||
-      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80";
+      (sender.avatar_url as string) || DEFAULT_GITHUB_AVATAR;
+
+    const repoName = (repository.name as string) || "antigravity-portfolio";
+    const repoUrl =
+      (repository.html_url as string) || `${DEFAULT_GITHUB_PROFILE_URL}/${repoName}`;
 
     return {
       id: `gh-${sha}`,
       sha,
       shortSha,
-      repository: (repository.name as string) || "antigravity-spacecraft",
+      repository: repoName,
       branch,
       message: message.split("\n")[0] ?? "Commit update",
       author: {
         name: authorName,
-        username: (sender.login as string) || "cosmic-dev",
+        username: (sender.login as string) || DEFAULT_GITHUB_USERNAME,
         avatarUrl,
       },
       timestamp: (headCommit.timestamp as string) || "2026-10-15T04:00:00Z",
-      url: (headCommit.url as string) || (repository.html_url as string) || "https://github.com",
+      url: (headCommit.url as string) || repoUrl,
       stats: {
-        additions: Number((headCommit.added as unknown[])?.length || 12),
+        additions: Number((headCommit.added as unknown[])?.length || 18),
         deletions: Number((headCommit.removed as unknown[])?.length || 2),
-        filesChanged: Number((headCommit.modified as unknown[])?.length || 3),
+        filesChanged: Number((headCommit.modified as unknown[])?.length || 4),
       },
       event: "push",
       physicsImpulse: {
@@ -57,23 +64,23 @@ export function parseGithubWebhookCommit(
 }
 
 /**
- * Initial GitHub repositories for portfolio showcase.
+ * Initial GitHub repositories for RIAZUL (DEadEnD) portfolio showcase.
  */
 export const INITIAL_GITHUB_PROJECTS: GithubProject[] = [
   {
     id: 1,
-    name: "antigravity-engine",
-    fullName: "core/antigravity-engine",
-    description: "Rust WASM zero-gravity physics runtime with WebGPU shader pipelines and reactive React fiber bindings.",
-    htmlUrl: "https://github.com/stellar-core/antigravity-engine",
-    homepageUrl: "https://antigravity.space",
-    starsCount: 1420,
-    forksCount: 132,
-    watchersCount: 94,
-    openIssuesCount: 4,
-    language: "Rust",
-    languages: ["Rust", "TypeScript", "WGSL", "WebAssembly"],
-    topics: ["webgpu", "wasm", "rapier", "physics", "threejs"],
+    name: "flutter-crossplatform-core",
+    fullName: "MIR-RIAZUL/flutter-crossplatform-core",
+    description: "Enterprise cross-platform mobile architecture with Flutter, custom render tree optimizations, and offline-first state synchronization.",
+    htmlUrl: "https://github.com/MIR-RIAZUL/flutter-crossplatform-core",
+    homepageUrl: "https://github.com/MIR-RIAZUL",
+    starsCount: 1680,
+    forksCount: 154,
+    watchersCount: 112,
+    openIssuesCount: 3,
+    language: "Dart",
+    languages: ["Dart", "Flutter", "Kotlin", "Swift"],
+    topics: ["flutter", "dart", "mobile-app", "cross-platform", "architecture"],
     isArchived: false,
     isFork: false,
     pushedAt: "2026-10-15T03:18:00Z",
@@ -81,27 +88,27 @@ export const INITIAL_GITHUB_PROJECTS: GithubProject[] = [
     updatedAt: "2026-10-15T04:00:00Z",
     visibility: "public",
     metrics: {
-      velocity: 98,
+      velocity: 99,
       healthScore: 99,
       physicsWeight: 1.2,
     },
-    primaryColor: "#6366f1",
-    glowColor: "rgba(99, 102, 241, 0.4)",
+    primaryColor: "#06b6d4",
+    glowColor: "rgba(6, 182, 212, 0.4)",
   },
   {
     id: 2,
-    name: "meshlink-quic-stream",
-    fullName: "core/meshlink-quic-stream",
-    description: "Multipath QUIC and WebTransport distributed mesh streaming with sub-millisecond chunk acknowledge latency.",
-    htmlUrl: "https://github.com/stellar-core/meshlink-quic-stream",
-    homepageUrl: null,
-    starsCount: 890,
-    forksCount: 78,
-    watchersCount: 45,
-    openIssuesCount: 2,
+    name: "antigravity-webgpu-engine",
+    fullName: "MIR-RIAZUL/antigravity-webgpu-engine",
+    description: "Full-stack zero-gravity spatial computing portfolio powered by Next.js Turbopack, Three.js WebGPU, and Rust Rapier WASM physics.",
+    htmlUrl: "https://github.com/MIR-RIAZUL/antigravity-webgpu-engine",
+    homepageUrl: "https://github.com/MIR-RIAZUL",
+    starsCount: 1240,
+    forksCount: 96,
+    watchersCount: 68,
+    openIssuesCount: 1,
     language: "TypeScript",
-    languages: ["TypeScript", "Go", "ProtocolBuffers"],
-    topics: ["quic", "webtransport", "distributed-systems", "streaming"],
+    languages: ["TypeScript", "Next.js", "WebGPU", "Rust", "WASM"],
+    topics: ["nextjs", "turbopack", "webgpu", "threejs", "rapier-physics"],
     isArchived: false,
     isFork: false,
     pushedAt: "2026-10-15T01:00:00Z",
@@ -109,27 +116,27 @@ export const INITIAL_GITHUB_PROJECTS: GithubProject[] = [
     updatedAt: "2026-10-15T04:00:00Z",
     visibility: "public",
     metrics: {
-      velocity: 92,
-      healthScore: 96,
-      physicsWeight: 0.9,
+      velocity: 95,
+      healthScore: 98,
+      physicsWeight: 1.0,
     },
-    primaryColor: "#06b6d4",
-    glowColor: "rgba(6, 182, 212, 0.4)",
+    primaryColor: "#6366f1",
+    glowColor: "rgba(99, 102, 241, 0.4)",
   },
   {
     id: 3,
-    name: "quantum-capsule-store",
-    fullName: "core/quantum-capsule-store",
-    description: "Decentralized immutable knowledge capsules anchored by post-quantum lattice cryptography and local vector search.",
-    htmlUrl: "https://github.com/stellar-core/quantum-capsule-store",
-    homepageUrl: null,
-    starsCount: 654,
-    forksCount: 41,
-    watchersCount: 38,
-    openIssuesCount: 1,
+    name: "github-ecosystem-streamer",
+    fullName: "MIR-RIAZUL/github-ecosystem-streamer",
+    description: "Real-time GitHub webhook ingestion and Server-Sent Events broadcasting commit telemetry to reactive spatial visualization clients.",
+    htmlUrl: "https://github.com/MIR-RIAZUL/github-ecosystem-streamer",
+    homepageUrl: "https://github.com/MIR-RIAZUL",
+    starsCount: 890,
+    forksCount: 62,
+    watchersCount: 44,
+    openIssuesCount: 2,
     language: "TypeScript",
-    languages: ["TypeScript", "Rust", "SQLite"],
-    topics: ["cryptography", "knowledge-base", "vector-db", "pqc"],
+    languages: ["TypeScript", "Node.js", "Server-Sent-Events", "GitHub-API"],
+    topics: ["github-api", "webhooks", "streaming", "sse", "automation"],
     isArchived: false,
     isFork: false,
     pushedAt: "2026-10-14T18:00:00Z",
@@ -137,9 +144,9 @@ export const INITIAL_GITHUB_PROJECTS: GithubProject[] = [
     updatedAt: "2026-10-15T04:00:00Z",
     visibility: "public",
     metrics: {
-      velocity: 86,
-      healthScore: 94,
-      physicsWeight: 1.5,
+      velocity: 91,
+      healthScore: 96,
+      physicsWeight: 1.4,
     },
     primaryColor: "#a855f7",
     glowColor: "rgba(168, 85, 247, 0.4)",

@@ -42,27 +42,27 @@ export default function PublicPortfolioPage() {
             </div>
             <div>
               <span className="font-black text-sm tracking-wider uppercase bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
-                ANTIGRAVITY // PORTFOLIO
+                RIAZUL // DEadEnD
               </span>
               <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>LEO-8 STATION</span>
+                <span>DHAKA STATION</span>
                 <span>·</span>
-                <span className="text-cyan-400">WASM SIMD ON</span>
+                <span className="text-cyan-400">FLUTTER & WASM READY</span>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
             <a
-              href="https://github.com"
+              href="https://github.com/MIR-RIAZUL"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:inline-flex"
             >
               <Button size="sm" variant="ghost" className="text-xs font-mono gap-1.5 text-slate-300">
                 <GithubIcon className="w-3.5 h-3.5" />
-                GitHub
+                @MIR-RIAZUL
               </Button>
             </a>
 
@@ -114,11 +114,11 @@ export default function PublicPortfolioPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 font-mono text-[11px]">
             <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-            <span>Telemetry Link: SECURE // RUST WASM + THREE.JS WEBGPU</span>
+            <span>Telemetry Link: SECURE // RIAZUL (DEadEnD) // DHAKA, BD</span>
           </div>
 
           <p className="font-mono text-[11px] text-slate-400">
-            © 2026 Antigravity Systems. Bending physics in orbit.
+            © 2026 RIAZUL // DEadEnD. All systems operational.
           </p>
 
           <div className="flex items-center gap-2">
