@@ -1,5 +1,14 @@
-import { ProfileBio, LocationArea, IdeaCapsule, AdminTelemetry, LiveGithubCommit } from "@/types";
+import { 
+  ProfileBio, 
+  LocationArea, 
+  IdeaCapsule, 
+  AdminTelemetry, 
+  LiveGithubCommit, 
+  GithubProject, 
+  PhysicsConfig 
+} from "@/types";
 import { INITIAL_GITHUB_PROJECTS } from "./github";
+import { DEFAULT_PHYSICS_CONFIG } from "./physics";
 
 export { INITIAL_GITHUB_PROJECTS };
 
@@ -162,3 +171,258 @@ export const INITIAL_ADMIN_TELEMETRY: AdminTelemetry = {
   streamConnectionsCount: 12,
   fpsTarget: 60,
 };
+
+export interface OrbitalStoreData {
+  bio: ProfileBio;
+  projects: GithubProject[];
+  capsules: IdeaCapsule[];
+  commits: LiveGithubCommit[];
+  physicsConfig: PhysicsConfig;
+  updatedAt: string;
+}
+
+// In-memory cache holding active database state
+let memoryStore: OrbitalStoreData | null = null;
+
+/**
+ * Dynamic resolution of Node fs and path modules.
+ * Using eval("require") ensures client-side bundlers (Webpack/Turbopack)
+ * do not try to bundle Node native modules into browser bundles.
+ */
+function getNodeModules(): { fs: typeof import("fs"); path: typeof import("path") } | null {
+  if (typeof window === "undefined") {
+    try {
+      const nodeRequire = eval("require");
+      const fs = nodeRequire("fs");
+      const path = nodeRequire("path");
+      return { fs, path };
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function getStoreFilePath(): string | null {
+  const mods = getNodeModules();
+  if (!mods) return null;
+  const dataDir = mods.path.join(process.cwd(), ".data");
+  if (!mods.fs.existsSync(dataDir)) {
+    try {
+      mods.fs.mkdirSync(dataDir, { recursive: true });
+    } catch {
+      // directory creation handled
+    }
+  }
+  return mods.path.join(dataDir, "orbital-store.json");
+}
+
+function createDefaultStoreData(): OrbitalStoreData {
+  return {
+    bio: JSON.parse(JSON.stringify(INITIAL_PROFILE_BIO)),
+    projects: JSON.parse(JSON.stringify(INITIAL_GITHUB_PROJECTS)),
+    capsules: JSON.parse(JSON.stringify(INITIAL_IDEA_CAPSULES)),
+    commits: JSON.parse(JSON.stringify(INITIAL_COMMITS)),
+    physicsConfig: JSON.parse(JSON.stringify(DEFAULT_PHYSICS_CONFIG)),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+function loadStore(): OrbitalStoreData {
+  if (memoryStore) {
+    return memoryStore;
+  }
+
+  const filePath = getStoreFilePath();
+  const mods = getNodeModules();
+
+  if (filePath && mods && mods.fs.existsSync(filePath)) {
+    try {
+      const raw = mods.fs.readFileSync(filePath, "utf-8");
+      const parsed = JSON.parse(raw);
+      memoryStore = {
+        bio: parsed.bio || INITIAL_PROFILE_BIO,
+        projects: parsed.projects || INITIAL_GITHUB_PROJECTS,
+        capsules: parsed.capsules || INITIAL_IDEA_CAPSULES,
+        commits: parsed.commits || INITIAL_COMMITS,
+        physicsConfig: parsed.physicsConfig || DEFAULT_PHYSICS_CONFIG,
+        updatedAt: parsed.updatedAt || new Date().toISOString(),
+      };
+      return memoryStore;
+    } catch {
+      // Fallback to defaults on read error
+    }
+  }
+
+  memoryStore = createDefaultStoreData();
+  saveStore(memoryStore);
+  return memoryStore;
+}
+
+function saveStore(store: OrbitalStoreData): void {
+  memoryStore = store;
+  const filePath = getStoreFilePath();
+  const mods = getNodeModules();
+
+  if (filePath && mods) {
+    try {
+      mods.fs.writeFileSync(filePath, JSON.stringify(store, null, 2), "utf-8");
+    } catch {
+      // persistence write error handled
+    }
+  }
+}
+
+/** Get current profile bio snapshot */
+export function getBio(): ProfileBio {
+  return loadStore().bio;
+}
+
+/** Update profile bio with partial fields and persist to disk */
+export function updateBio(partial: Partial<ProfileBio>): ProfileBio {
+  const store = loadStore();
+  store.bio = {
+    ...store.bio,
+    ...partial,
+    location: partial.location ? { ...store.bio.location, ...partial.location } : store.bio.location,
+    updatedAt: new Date().toISOString(),
+  };
+  store.updatedAt = new Date().toISOString();
+  saveStore(store);
+  return store.bio;
+}
+
+/** Update location within profile bio and persist to disk */
+export function updateLocation(partial: Partial<LocationArea>): ProfileBio {
+  const store = loadStore();
+  store.bio.location = {
+    ...store.bio.location,
+    ...partial,
+  };
+  store.bio.updatedAt = new Date().toISOString();
+  store.updatedAt = new Date().toISOString();
+  saveStore(store);
+  return store.bio;
+}
+
+/** Get all projects */
+export function getProjects(): GithubProject[] {
+  return loadStore().projects;
+}
+
+/** Upsert a project by id and persist to disk */
+export function upsertProject(project: GithubProject): GithubProject {
+  const store = loadStore();
+  const index = store.projects.findIndex((p) => String(p.id) === String(project.id));
+  const updatedProject = {
+    ...project,
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (index >= 0) {
+    store.projects[index] = { ...store.projects[index], ...updatedProject };
+  } else {
+    store.projects.push(updatedProject);
+  }
+
+  store.updatedAt = new Date().toISOString();
+  saveStore(store);
+  return updatedProject;
+}
+
+/** Delete a project by id and persist to disk */
+export function deleteProject(id: string | number): boolean {
+  const store = loadStore();
+  const initialLen = store.projects.length;
+  store.projects = store.projects.filter((p) => String(p.id) !== String(id));
+  if (store.projects.length !== initialLen) {
+    store.updatedAt = new Date().toISOString();
+    saveStore(store);
+    return true;
+  }
+  return false;
+}
+
+/** Get all idea capsules */
+export function getCapsules(): IdeaCapsule[] {
+  return loadStore().capsules;
+}
+
+/** Upsert an idea capsule by id and persist to disk */
+export function upsertCapsule(capsule: IdeaCapsule): IdeaCapsule {
+  const store = loadStore();
+  const index = store.capsules.findIndex((c) => c.id === capsule.id);
+  const updatedCapsule = {
+    ...capsule,
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (index >= 0) {
+    store.capsules[index] = { ...store.capsules[index], ...updatedCapsule };
+  } else {
+    store.capsules.push(updatedCapsule);
+  }
+
+  store.updatedAt = new Date().toISOString();
+  saveStore(store);
+  return updatedCapsule;
+}
+
+/** Delete an idea capsule by id and persist to disk */
+export function deleteCapsule(id: string): boolean {
+  const store = loadStore();
+  const initialLen = store.capsules.length;
+  store.capsules = store.capsules.filter((c) => c.id !== id);
+  if (store.capsules.length !== initialLen) {
+    store.updatedAt = new Date().toISOString();
+    saveStore(store);
+    return true;
+  }
+  return false;
+}
+
+/** Get physics configuration */
+export function getPhysicsConfig(): PhysicsConfig {
+  return loadStore().physicsConfig;
+}
+
+/** Update physics configuration and persist to disk */
+export function updatePhysicsConfigState(partial: Partial<PhysicsConfig>): PhysicsConfig {
+  const store = loadStore();
+  store.physicsConfig = {
+    ...store.physicsConfig,
+    ...partial,
+  };
+  store.updatedAt = new Date().toISOString();
+  saveStore(store);
+  return store.physicsConfig;
+}
+
+/** Get all live commits */
+export function getCommits(): LiveGithubCommit[] {
+  return loadStore().commits;
+}
+
+/** Add a new live commit and persist to disk (capped at 50) */
+export function addCommit(commit: LiveGithubCommit): LiveGithubCommit {
+  const store = loadStore();
+  store.commits.unshift(commit);
+  if (store.commits.length > 50) {
+    store.commits = store.commits.slice(0, 50);
+  }
+  store.updatedAt = new Date().toISOString();
+  saveStore(store);
+  return commit;
+}
+
+/** Reset store to original RIAZUL // DEadEnD seed defaults and persist to disk */
+export function resetStoreToDefaults(): OrbitalStoreData {
+  const fresh = createDefaultStoreData();
+  saveStore(fresh);
+  return fresh;
+}
+
+/** Get full snapshot of store state */
+export function getStoreSnapshot(): OrbitalStoreData {
+  return loadStore();
+}
