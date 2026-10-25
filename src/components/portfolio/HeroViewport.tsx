@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import {
   Radio, 
   Activity,
   RotateCcw,
+  Share2,
   X 
 } from "lucide-react";
 
@@ -57,7 +59,31 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
     setFormationMode,
     collisionCount,
     resetSimulation,
+    tethersEnabled,
+    toggleTethers,
   } = useGravity();
+
+  const [fps, setFps] = useState<number>(60);
+
+  // High-precision live client FPS telemetry monitor
+  useEffect(() => {
+    let frameCount = 0;
+    let lastTime = performance.now();
+    let animId: number;
+
+    const measureFps = (now: number) => {
+      frameCount++;
+      if (now - lastTime >= 500) {
+        setFps(Math.round((frameCount * 1000) / (now - lastTime)));
+        frameCount = 0;
+        lastTime = now;
+      }
+      animId = requestAnimationFrame(measureFps);
+    };
+
+    animId = requestAnimationFrame(measureFps);
+    return () => cancelAnimationFrame(animId);
+  }, []);
 
   const activeCapsule = INITIAL_IDEA_CAPSULES.find(
     (c) => c.id === selectedCapsuleId
@@ -149,6 +175,19 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
             <Radio className={`w-3.5 h-3.5 ${cursorForceEnabled ? "text-[#00f0ff] animate-pulse" : "text-slate-400"}`} />
             <span className="hidden sm:inline">{cursorForceEnabled ? "FORCE FIELD: ON" : "FORCE FIELD: OFF"}</span>
             <span className="sm:hidden">{cursorForceEnabled ? "FORCE: ON" : "FORCE: OFF"}</span>
+          </Button>
+
+          {/* 3D Orbital Energy Tether Beams Toggle */}
+          <Button
+            size="sm"
+            variant={tethersEnabled ? "glow" : "outline"}
+            onClick={toggleTethers}
+            className="text-xs font-mono gap-1 text-[#00f0ff] border-[#00f0ff]/40 hover:bg-[#00f0ff]/10"
+            title="Toggle 3D Orbital Energy Tether Beams"
+          >
+            <Share2 className={`w-3.5 h-3.5 ${tethersEnabled ? "text-[#00f0ff]" : "text-slate-400"}`} />
+            <span className="hidden sm:inline">{tethersEnabled ? "TETHERS: ON" : "TETHERS: OFF"}</span>
+            <span className="sm:hidden">{tethersEnabled ? "TETHERS: ON" : "TETHERS: OFF"}</span>
           </Button>
 
           {/* Orbit Re-Center Recall */}
@@ -245,8 +284,44 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
         </div>
       )}
 
-      {/* Bottom Hero Callout Banner with HUD Glass */}
-      <div className="absolute bottom-4 left-4 right-4 z-10 pointer-events-none">
+      {/* Bottom Hero Callout Banner & Micro-Telemetry Strip with HUD Glass */}
+      <div className="absolute bottom-4 left-4 right-4 z-10 pointer-events-none flex flex-col gap-2.5">
+        {/* JetBrains Mono Micro-Telemetry Readout Strip */}
+        <div className="pointer-events-auto flex items-center justify-between gap-3 px-3.5 py-1.5 rounded-xl bg-slate-950/85 border border-slate-800/80 backdrop-blur-md font-mono text-[10px] sm:text-[11px] text-slate-400 shadow-md flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="flex items-center gap-1.5 text-[#00f0ff] font-semibold tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00f0ff] animate-ping" />
+              PHYSICS TELEMETRY
+            </span>
+            <span className="text-slate-700 hidden xs:inline">|</span>
+            <span className="text-emerald-400 font-bold tracking-wider">{fps} FPS</span>
+            <span className="text-slate-700 hidden sm:inline">|</span>
+            <span className="hidden sm:inline">
+              RIGID BODIES: <strong className="text-slate-200">{INITIAL_IDEA_CAPSULES.length + 1}</strong>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span>
+              GRAVITY VECTOR:{" "}
+              <strong className={isZeroGravity ? "text-[#00f0ff]" : "text-amber-400"}>
+                [{physicsConfig.gravity.map((v) => v.toFixed(2)).join(", ")}]
+              </strong>
+            </span>
+            <span className="text-slate-700 hidden md:inline">|</span>
+            <span className="hidden md:inline">
+              FORMATION: <strong className="text-purple-400 uppercase">{formationMode}</strong>
+            </span>
+            <span className="text-slate-700 hidden lg:inline">|</span>
+            <span className="hidden lg:inline text-slate-500">
+              TETHERS:{" "}
+              <strong className={tethersEnabled ? "text-[#00f0ff]" : "text-slate-500"}>
+                {tethersEnabled ? "ACTIVE" : "OFF"}
+              </strong>
+            </span>
+          </div>
+        </div>
+
         <div className="hud-glass rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pointer-events-auto border-[#00f0ff]/25 shadow-[0_0_30px_rgba(0,240,255,0.15)]">
           <div className="space-y-1">
             <div className="flex items-center gap-2">

@@ -8,6 +8,7 @@ import { FloatingCapsule } from "./FloatingCapsule";
 import { CursorForceField } from "./CursorForceField";
 import { CentralCoreOrb } from "./CentralCoreOrb";
 import { ShockwavePulseRing } from "./ShockwavePulseRing";
+import { OrbitalTetherLines } from "./OrbitalTetherLines";
 import { INITIAL_IDEA_CAPSULES } from "@/lib/db";
 import { PHYSICS_BOUNDS } from "@/lib/physics";
 import { useGravity } from "@/context/GravityContext";
@@ -104,6 +105,9 @@ export function PhysicsWorld({
 
         {/* 3D Shockwave Pulse Ring & Holographic Radar Grid */}
         <ShockwavePulseRing />
+
+        {/* 3D High-Contrast Orbital Energy Tether Beams */}
+        <OrbitalTetherLines />
 
         {/* 3D Kinematic Cursor Force-Field */}
         <CursorForceField />

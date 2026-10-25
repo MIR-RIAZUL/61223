@@ -53,6 +53,7 @@ export function FloatingCapsule({
     registerCollision,
     setIsDraggingCapsule,
     resetCount,
+    updateCapsulePosition,
   } = useGravity();
 
   const isSelected = selectedCapsuleId === id;
@@ -114,6 +115,9 @@ export function FloatingCapsule({
   // Main 3D frame update: Grab-and-throw spring physics & Orbital Formation Modes
   useFrame(({ pointer, viewport, clock }, delta) => {
     if (!rigidBodyRef.current) return;
+
+    const currentTranslation = rigidBodyRef.current.translation();
+    updateCapsulePosition(id, [currentTranslation.x, currentTranslation.y, currentTranslation.z]);
 
     // 1. Interactive 3D Pointer Grab-and-Throw Mechanics
     if (isDragging) {

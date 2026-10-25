@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useMemo } from "react";
+import React, { createContext, useContext, useState, useCallback, useMemo, useRef } from "react";
 import { PhysicsConfig } from "@/types";
 import { DEFAULT_PHYSICS_CONFIG } from "@/lib/physics";
 
@@ -25,6 +25,10 @@ export interface GravityContextType {
   setIsDraggingCapsule: (val: boolean) => void;
   resetCount: number;
   resetSimulation: () => void;
+  tethersEnabled: boolean;
+  toggleTethers: () => void;
+  capsulePositionsRef: React.RefObject<Record<string, [number, number, number]>>;
+  updateCapsulePosition: (id: string, pos: [number, number, number]) => void;
 }
 
 const GravityContext = createContext<GravityContextType | null>(null);
@@ -38,6 +42,8 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
   const [collisionCount, setCollisionCount] = useState<number>(0);
   const [isDraggingCapsule, setIsDraggingCapsuleState] = useState<boolean>(false);
   const [resetCount, setResetCount] = useState<number>(0);
+  const [tethersEnabled, setTethersEnabled] = useState<boolean>(true);
+  const capsulePositionsRef = useRef<Record<string, [number, number, number]>>({});
 
   const isZeroGravity = useMemo(
     () => physicsConfig.gravity[1] === 0,
@@ -91,6 +97,14 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
     setFormationMode('free-drift');
   }, []);
 
+  const toggleTethers = useCallback(() => {
+    setTethersEnabled((prev) => !prev);
+  }, []);
+
+  const updateCapsulePosition = useCallback((id: string, pos: [number, number, number]) => {
+    capsulePositionsRef.current[id] = pos;
+  }, []);
+
   const value = useMemo(
     () => ({
       physicsConfig,
@@ -111,6 +125,10 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
       setIsDraggingCapsule,
       resetCount,
       resetSimulation,
+      tethersEnabled,
+      toggleTethers,
+      capsulePositionsRef,
+      updateCapsulePosition,
     }),
     [
       physicsConfig,
@@ -130,6 +148,10 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
       setIsDraggingCapsule,
       resetCount,
       resetSimulation,
+      tethersEnabled,
+      toggleTethers,
+      capsulePositionsRef,
+      updateCapsulePosition,
     ]
   );
 
