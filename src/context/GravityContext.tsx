@@ -23,6 +23,8 @@ export interface GravityContextType {
   registerCollision: () => void;
   isDraggingCapsule: boolean;
   setIsDraggingCapsule: (val: boolean) => void;
+  resetCount: number;
+  resetSimulation: () => void;
 }
 
 const GravityContext = createContext<GravityContextType | null>(null);
@@ -35,6 +37,7 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
   const [formationMode, setFormationMode] = useState<FormationMode>('free-drift');
   const [collisionCount, setCollisionCount] = useState<number>(0);
   const [isDraggingCapsule, setIsDraggingCapsuleState] = useState<boolean>(false);
+  const [resetCount, setResetCount] = useState<number>(0);
 
   const isZeroGravity = useMemo(
     () => physicsConfig.gravity[1] === 0,
@@ -82,6 +85,12 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
     setIsDraggingCapsuleState(val);
   }, []);
 
+  const resetSimulation = useCallback(() => {
+    setResetCount((prev) => prev + 1);
+    setSelectedCapsuleId(null);
+    setFormationMode('free-drift');
+  }, []);
+
   const value = useMemo(
     () => ({
       physicsConfig,
@@ -100,6 +109,8 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
       registerCollision,
       isDraggingCapsule,
       setIsDraggingCapsule,
+      resetCount,
+      resetSimulation,
     }),
     [
       physicsConfig,
@@ -117,6 +128,8 @@ export function GravityProvider({ children }: { children: React.ReactNode }) {
       registerCollision,
       isDraggingCapsule,
       setIsDraggingCapsule,
+      resetCount,
+      resetSimulation,
     ]
   );
 

@@ -36,11 +36,13 @@ export function FloatingCapsule({
   const [hovered, setHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [collisionFlash, setCollisionFlash] = useState(false);
+  const [recallFlash, setRecallFlash] = useState(false);
 
   const lastShockwaveRef = useRef(0);
   const lastCollisionTimeRef = useRef(0);
   const lastPointerVelocity = useRef(new THREE.Vector3(0, 0, 0));
   const previousPointerPos = useRef(new THREE.Vector3(0, 0, 0));
+  const lastResetCountRef = useRef(0);
 
   const {
     isZeroGravity,
@@ -50,6 +52,7 @@ export function FloatingCapsule({
     formationMode,
     registerCollision,
     setIsDraggingCapsule,
+    resetCount,
   } = useGravity();
 
   const isSelected = selectedCapsuleId === id;
@@ -87,6 +90,26 @@ export function FloatingCapsule({
       lastShockwaveRef.current = shockwaveCount;
     }
   }, [shockwaveCount]);
+
+  // Orbit Re-Center Recall: teleport capsule back to initial position
+  useEffect(() => {
+    if (resetCount > 0 && resetCount !== lastResetCountRef.current) {
+      lastResetCountRef.current = resetCount;
+      if (rigidBodyRef.current) {
+        rigidBodyRef.current.wakeUp();
+        rigidBodyRef.current.setTranslation(
+          { x: position[0], y: position[1], z: position[2] },
+          true
+        );
+        rigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+        rigidBodyRef.current.setAngvel({ x: 0, y: 0, z: 0 }, true);
+        setRecallFlash(true);
+        setTimeout(() => setRecallFlash(false), 400);
+      }
+    } else {
+      lastResetCountRef.current = resetCount;
+    }
+  }, [resetCount, position]);
 
   // Main 3D frame update: Grab-and-throw spring physics & Orbital Formation Modes
   useFrame(({ pointer, viewport, clock }, delta) => {
@@ -261,7 +284,9 @@ export function FloatingCapsule({
           <capsuleGeometry args={[0.45, 0.9, 16, 32]} />
           <meshStandardMaterial
             color={
-              collisionFlash
+              recallFlash
+                ? "#00f0ff"
+                : collisionFlash
                 ? "#f59e0b"
                 : isDragging
                 ? "#f59e0b"
@@ -274,7 +299,9 @@ export function FloatingCapsule({
             roughness={0.22}
             metalness={0.85}
             emissive={
-              collisionFlash
+              recallFlash
+                ? "#00f0ff"
+                : collisionFlash
                 ? "#f59e0b"
                 : isDragging
                 ? "#f59e0b"
@@ -283,7 +310,9 @@ export function FloatingCapsule({
                 : color
             }
             emissiveIntensity={
-              collisionFlash
+              recallFlash
+                ? 3.5
+                : collisionFlash
                 ? 2.5
                 : isDragging
                 ? 1.8

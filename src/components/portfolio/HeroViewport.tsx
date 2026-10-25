@@ -16,6 +16,7 @@ import {
   Zap, 
   Radio, 
   Activity,
+  RotateCcw,
   X 
 } from "lucide-react";
 
@@ -55,6 +56,7 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
     formationMode,
     setFormationMode,
     collisionCount,
+    resetSimulation,
   } = useGravity();
 
   const activeCapsule = INITIAL_IDEA_CAPSULES.find(
@@ -147,6 +149,18 @@ export function HeroViewport({ onSelectCapsule }: HeroViewportProps) {
             <Radio className={`w-3.5 h-3.5 ${cursorForceEnabled ? "text-[#00f0ff] animate-pulse" : "text-slate-400"}`} />
             <span className="hidden sm:inline">{cursorForceEnabled ? "FORCE FIELD: ON" : "FORCE FIELD: OFF"}</span>
             <span className="sm:hidden">{cursorForceEnabled ? "FORCE: ON" : "FORCE: OFF"}</span>
+          </Button>
+
+          {/* Orbit Re-Center Recall */}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={resetSimulation}
+            className="text-xs font-mono gap-1 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/10"
+            title="Recall all capsules to initial orbit positions"
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline">RE-CENTER</span>
           </Button>
 
           {/* Kinetic Shockwave Impulse Trigger */}

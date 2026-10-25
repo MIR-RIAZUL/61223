@@ -7,6 +7,7 @@ import { SpaceBackground } from "./SpaceBackground";
 import { FloatingCapsule } from "./FloatingCapsule";
 import { CursorForceField } from "./CursorForceField";
 import { CentralCoreOrb } from "./CentralCoreOrb";
+import { ShockwavePulseRing } from "./ShockwavePulseRing";
 import { INITIAL_IDEA_CAPSULES } from "@/lib/db";
 import { PHYSICS_BOUNDS } from "@/lib/physics";
 import { useGravity } from "@/context/GravityContext";
@@ -100,6 +101,9 @@ export function PhysicsWorld({
 
         {/* 3D DEadEnD Central Gravitational Core Orb Collider */}
         <CentralCoreOrb />
+
+        {/* 3D Shockwave Pulse Ring & Holographic Radar Grid */}
+        <ShockwavePulseRing />
 
         {/* 3D Kinematic Cursor Force-Field */}
         <CursorForceField />
