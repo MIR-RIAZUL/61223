@@ -10,11 +10,13 @@ import {
   Terminal, 
   Move3d, 
   Zap, 
-  Clock 
+  Clock,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 
 export function OrbitalNavbar() {
-  const { isZeroGravity, toggleZeroGravity, triggerShockwave } = useGravity();
+  const { isZeroGravity, toggleZeroGravity, triggerShockwave, soundEnabled, toggleSound } = useGravity();
   const [dhakaTime, setDhakaTime] = useState<string>("DHAKA 00:00:00 UTC+6");
   const [pulseActive, setPulseActive] = useState(false);
 
@@ -139,10 +141,28 @@ export function OrbitalNavbar() {
             variant={isZeroGravity ? "glow" : "outline"}
             onClick={toggleZeroGravity}
             className="text-xs font-mono gap-1"
-            title="Toggle between Zero Gravity and Earth Gravity"
+            title="Toggle between Zero Gravity and Earth Gravity (HotKey: G)"
           >
             <Move3d className="w-3.5 h-3.5" />
             <span>{isZeroGravity ? "0G WEIGHTLESS" : "1G LOCKED"}</span>
+          </Button>
+
+          {/* Procedural Web Audio SFX Toggle */}
+          <Button
+            size="sm"
+            variant={soundEnabled ? "glow" : "outline"}
+            onClick={toggleSound}
+            className={`text-xs font-mono gap-1 transition-all ${
+              soundEnabled ? "text-[#00f0ff] border-[#00f0ff]/40" : "text-slate-400 border-slate-800"
+            }`}
+            title="Toggle Procedural Zero-G Synthesizer Audio (HotKey: M)"
+          >
+            {soundEnabled ? (
+              <Volume2 className="w-3.5 h-3.5 text-[#00f0ff]" />
+            ) : (
+              <VolumeX className="w-3.5 h-3.5 text-slate-500" />
+            )}
+            <span className="hidden sm:inline">{soundEnabled ? "SFX: ON" : "SFX: MUTED"}</span>
           </Button>
 
           {/* Admin Matrix Link */}
